@@ -22,9 +22,9 @@ Route::get('/', function () {
 // Autenticação (Laravel Breeze)
 require __DIR__ . '/auth.php';
 
-// Dashboard (requer login e e-mail verificado)
+// Dashboard (APENAS gerente/adm)
 Route::get('/dashboard', fn() => view('dashboard'))
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'role:adm|gerente'])
     ->name('dashboard');
 
 // Perfil (logado)
@@ -37,9 +37,10 @@ Route::middleware('auth')->group(function () {
 // Áreas protegidas
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // CLIENTE: compras e pedidos
+    // CLIENTE + STAFF: Pedidos e SAC (não existe dashboard do cliente)
     Route::middleware('role:cliente|adm|gerente')->group(function () {
-        Route::get('/cliente', fn() => response('Área do cliente', 200))->name('cliente.dashboard');
+        // (Removido) Dashboard do cliente
+        // Route::get('/cliente', fn() => response('Área do cliente', 200))->name('cliente.dashboard');
 
         // Pedidos
         Route::get('/pedidos',            [CustomerOrderController::class, 'index'])->name('cliente.pedidos.index');
@@ -47,16 +48,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/pedidos/{pedido}',   [CustomerOrderController::class, 'show'])->name('cliente.pedidos.show');
         Route::get('/rastreio/{code}',    [CustomerOrderController::class, 'track'])->name('cliente.pedidos.track');
 
-        Route::middleware(['auth', 'verified', 'role:cliente|adm|gerente'])->group(function () {
-            Route::prefix('sac')->name('cliente.sac.')->group(function () {
-                Route::get('/',                 [SupportTicketController::class, 'index'])->name('index');
-                Route::get('/novo/{order}',     [SupportTicketController::class, 'create'])->whereNumber('order')->name('create');
-                Route::post('/',                [SupportTicketController::class, 'store'])->name('store');
-                Route::get('/{ticket}',         [SupportTicketController::class, 'show'])->whereNumber('ticket')->name('show');
-                Route::post('/{ticket}/reply',  [SupportTicketController::class, 'reply'])->whereNumber('ticket')->name('reply');
-                Route::post('/{ticket}/close',  [SupportTicketController::class, 'close'])
-                    ->whereNumber('ticket')->name('close')->middleware('role:gerente|adm');
-            });
+        // SAC (atrelado a pedidos) — protegido
+        Route::prefix('sac')->name('cliente.sac.')->group(function () {
+            Route::get('/',                 [SupportTicketController::class, 'index'])->name('index');
+            Route::get('/novo/{order}',     [SupportTicketController::class, 'create'])->whereNumber('order')->name('create');
+            Route::post('/',                [SupportTicketController::class, 'store'])->name('store');
+            Route::get('/{ticket}',         [SupportTicketController::class, 'show'])->whereNumber('ticket')->name('show');
+            Route::post('/{ticket}/reply',  [SupportTicketController::class, 'reply'])->whereNumber('ticket')->name('reply');
+            Route::post('/{ticket}/close',  [SupportTicketController::class, 'close'])
+                ->whereNumber('ticket')->name('close')->middleware('role:gerente|adm');
         });
     });
 

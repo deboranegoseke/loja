@@ -16,7 +16,10 @@
                     <x-nav-link :href="url('/')" :active="request()->is('/')">Vitrine</x-nav-link>
 
                     @auth
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link>
+                        {{-- DASHBOARD: só adm/gerente --}}
+                        @if($user->hasRole(['adm','gerente']))
+                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link>
+                        @endif
 
                         @if($user->hasRole(['cliente','adm','gerente']) && Route::has('cliente.pedidos.index'))
                             <x-nav-link :href="route('cliente.pedidos.index')" :active="request()->routeIs('cliente.pedidos.*')">Meus Pedidos</x-nav-link>
@@ -103,7 +106,10 @@
             <x-responsive-nav-link :href="url('/')" :active="request()->is('/')">Vitrine</x-responsive-nav-link>
 
             @auth
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-responsive-nav-link>
+                {{-- DASHBOARD: só adm/gerente --}}
+                @if($user->hasRole(['adm','gerente']))
+                    <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-responsive-nav-link>
+                @endif
 
                 @if($user->hasRole(['cliente','adm','gerente']) && Route::has('cliente.pedidos.index'))
                     <x-responsive-nav-link :href="route('cliente.pedidos.index')" :active="request()->routeIs('cliente.pedidos.*')">Meus Pedidos</x-responsive-nav-link>
