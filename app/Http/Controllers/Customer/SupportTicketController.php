@@ -10,19 +10,39 @@ use Illuminate\Http\Request;
 
 class SupportTicketController extends Controller
 {
-    public function index(Request $request)
+    public function index(\Illuminate\Http\Request $request)
     {
+        $q = trim((string) $request->input('q'));
+        $status = $request->input('status'); // open | answered | closed | null
+
         $user = $request->user();
         $isStaff = $user->hasRole('gerente') || $user->hasRole('adm');
 
-        $tickets = SupportTicket::with('order:id')
-            ->when(!$isStaff, fn($q) => $q->where('user_id', $user->id))
+        $tickets = \App\Models\SupportTicket::query()
+            ->with(['user', 'order'])
+            // 👉 clientes veem só os próprios; gerente/adm veem todos
+            ->when(!$isStaff, fn($qb) => $qb->where('user_id', $user->id))
+            ->when($status, fn($qb) => $qb->where('status', $status))
+            ->when($q, function ($qb) use ($q) {
+                $qb->where(function ($qq) use ($q) {
+                    if (preg_match('/^\d+$/', $q)) {
+                        $qq->orWhere('id', (int) $q)
+                            ->orWhere('order_id', (int) $q);
+                    }
+                    $qq->orWhereHas('user', function ($uq) use ($q) {
+                        $uq->where('name', 'like', "%{$q}%")
+                            ->orWhere('email', 'like', "%{$q}%");
+                    });
+                });
+            })
             ->latest()
-            ->paginate(10)
+            ->paginate(12)
             ->withQueryString();
 
-        return view('customer.sac.index', compact('tickets', 'isStaff'));
+        return view('customer.sac.index', compact('tickets'));
     }
+
+
 
     public function create(Request $request, Order $order)
     {
@@ -109,7 +129,7 @@ class SupportTicketController extends Controller
         }
 
         $data = $request->validate([
-            'message' => ['required','string','max:5000'],
+            'message' => ['required', 'string', 'max:5000'],
         ]);
 
         SupportMessage::create([

@@ -5,6 +5,7 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 SAC — Pedido #{{ $order->id }}
             </h2>
+            <h6>resources\views\customer\sac\create.blade.php</h6>
             <a href="{{ route('cliente.pedidos.index') }}" class="text-sm text-gray-600 hover:text-gray-900">← Meus pedidos</a>
         </div>
     </x-slot>

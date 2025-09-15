@@ -7,13 +7,7 @@
         <x-input-error :messages="$errors->get('name')" class="mt-2" />
     </div>
 
-    <div>
-        <x-input-label value="SKU (opcional)" />
-        <x-text-input name="sku" type="text" class="mt-1 block w-full"
-                      :value="old('sku', $product->sku ?? '')" />
-        <x-input-error :messages="$errors->get('sku')" class="mt-2" />
-    </div>
-
+    
     <div>
         <x-input-label value="Preço de venda (R$)" />
         <x-text-input name="price" type="number" step="0.01" min="0" class="mt-1 block w-full"

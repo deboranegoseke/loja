@@ -7,13 +7,39 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::latest()->paginate(12);
-        return view('adm.produtos.index', compact('products'));
+        $q      = $request->string('q')->toString();
+        $active = $request->input('active'); // '1', '0' ou null/''
+        $stock  = $request->input('stock');  // 'in', 'out' ou null/''
+
+        $products = Product::query()
+            ->when($q, function ($query) use ($q) {
+                $query->where(function ($qb) use ($q) {
+                    $qb->where('name', 'like', "%{$q}%")
+                       ->orWhere('sku', 'like', "%{$q}%");
+                });
+            })
+            ->when($active !== null && $active !== '', function ($query) use ($active) {
+                $query->where('active', $active === '1' ? 1 : 0);
+            })
+            ->when($stock === 'in', function ($query) {
+                $query->where('stock', '>', 0);
+            })
+            ->when($stock === 'out', function ($query) {
+                $query->where(function ($q2) {
+                    $q2->whereNull('stock')->orWhere('stock', '<=', 0);
+                });
+            })
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('adm.produtos.index', compact('products', 'q', 'active', 'stock'));
     }
 
     public function create()
@@ -30,23 +56,30 @@ class ProductController extends Controller
             'price'       => 'required|numeric|min:0',
             'cost_price'  => 'nullable|numeric|min:0',
             'stock'       => 'nullable|integer|min:0',
-            'active'      => 'boolean',
+            'active'      => 'sometimes|boolean',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'image_url'   => 'nullable|url',
         ]);
 
-        $data['slug'] = Str::slug($data['name']).'-'.Str::random(5);
+        $data['active'] = $request->boolean('active');
+        $data['slug']   = Str::slug($data['name']).'-'.Str::random(5);
 
-        // upload local (prioritário)
-        if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('products', 'public');
+        try {
+            if ($request->hasFile('image')) {
+                $data['image_path'] = $request->file('image')->store('products', 'public');
+            }
+
+            $product = Product::create($data);
+
+            return redirect()
+                ->route('adm.produtos.edit', $product)
+                ->with('success', "Produto {$product->name} criado com sucesso!");
+        } catch (\Throwable $e) {
+            Log::error('Erro ao criar produto', ['error' => $e->getMessage()]);
+            return back()
+                ->with('error', 'Não foi possível criar o produto. Tente novamente.')
+                ->withInput();
         }
-
-        $product = Product::create($data);
-
-        return redirect()
-            ->route('adm.produtos.index')
-            ->with('status', "Produto {$product->name} criado com sucesso!");
     }
 
     public function edit(Product $produto)
@@ -63,37 +96,54 @@ class ProductController extends Controller
             'price'       => 'sometimes|required|numeric|min:0',
             'cost_price'  => 'nullable|numeric|min:0',
             'stock'       => 'nullable|integer|min:0',
-            'active'      => 'boolean',
+            'active'      => 'sometimes|boolean',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'image_url'   => 'nullable|url',
         ]);
 
+        if (array_key_exists('active', $data)) {
+            $data['active'] = $request->boolean('active');
+        }
+
         if (isset($data['name'])) {
-            // só atualiza se não existir slug
             $data['slug'] = $produto->slug ?: Str::slug($data['name']).'-'.Str::random(5);
         }
 
-        if ($request->hasFile('image')) {
-            // remove antiga se existir
-            if ($produto->image_path && Storage::disk('public')->exists($produto->image_path)) {
-                Storage::disk('public')->delete($produto->image_path);
+        try {
+            if ($request->hasFile('image')) {
+                if ($produto->image_path && Storage::disk('public')->exists($produto->image_path)) {
+                    Storage::disk('public')->delete($produto->image_path);
+                }
+                $data['image_path'] = $request->file('image')->store('products', 'public');
             }
-            $data['image_path'] = $request->file('image')->store('products', 'public');
+
+            $produto->update($data);
+
+            return redirect()
+                ->route('adm.produtos.edit', $produto)
+                ->with('success', 'Produto atualizado com sucesso!');
+        } catch (\Throwable $e) {
+            Log::error('Erro ao atualizar produto', ['product_id' => $produto->id, 'error' => $e->getMessage()]);
+            return back()
+                ->with('error', 'Não foi possível atualizar o produto. Tente novamente.')
+                ->withInput();
         }
-
-        $produto->update($data);
-
-        return redirect()
-            ->route('adm.produtos.edit', $produto)
-            ->with('status', "Produto atualizado!");
     }
 
     public function destroy(Product $produto)
     {
-        if ($produto->image_path && Storage::disk('public')->exists($produto->image_path)) {
-            Storage::disk('public')->delete($produto->image_path);
+        try {
+            if ($produto->image_path && Storage::disk('public')->exists($produto->image_path)) {
+                Storage::disk('public')->delete($produto->image_path);
+            }
+            $produto->delete();
+
+            return redirect()
+                ->route('adm.produtos.index')
+                ->with('success', 'Produto removido com sucesso.');
+        } catch (\Throwable $e) {
+            Log::error('Erro ao remover produto', ['product_id' => $produto->id, 'error' => $e->getMessage()]);
+            return back()->with('error', 'Não foi possível remover o produto.');
         }
-        $produto->delete();
-        return redirect()->route('adm.produtos.index')->with('status', 'Produto removido.');
     }
 }

@@ -16,13 +16,17 @@ class SupportTicket extends Model
         'order_id',
         'status',
         'closed_at',
-        // 'subject', // descomente se você criou essa coluna
+        // 'subject',
     ];
 
     protected $casts = [
         'closed_at' => 'datetime',
     ];
 
+    // Para aparecer como propriedade ($ticket->status_label) e em toArray()/JSON
+    protected $appends = ['status_label'];
+
+    // --- RELACIONAMENTOS ---
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -35,8 +39,18 @@ class SupportTicket extends Model
 
     public function messages(): HasMany
     {
-        // chave estrangeira é support_ticket_id em support_messages
         return $this->hasMany(SupportMessage::class, 'support_ticket_id')
                     ->orderBy('created_at');
+    }
+
+    // --- ACCESSORS ---
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'open'     => 'Aberto',
+            'answered' => 'Respondido',
+            'closed'   => 'Fechado',
+            default    => ucfirst((string) $this->status),
+        };
     }
 }

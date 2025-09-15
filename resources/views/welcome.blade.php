@@ -55,7 +55,7 @@
             </div>
         </div>
     </section>
-
+<h6>resources\views\welcome.blade.php  </h6>
     {{-- CATEGORIAS (tema cupcakes) --}}
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex flex-wrap gap-2">

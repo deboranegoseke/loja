@@ -15,6 +15,11 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="url('/')" :active="request()->is('/')">Vitrine</x-nav-link>
 
+                    {{-- NOVO: Carrinho (público) --}}
+                    @if(Route::has('cart.index'))
+                        <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">Carrinho</x-nav-link>
+                    @endif
+
                     @auth
                         {{-- DASHBOARD: só adm/gerente --}}
                         @if($user->hasRole(['adm','gerente']))
@@ -39,7 +44,7 @@
 
                         @if($user->hasRole('gerente') && Route::has('gerente.pedidos.index'))
                             <x-nav-link :href="route('gerente.pedidos.index')" :active="request()->routeIs('gerente.pedidos.*')">
-                                Pedidos (gerente)
+                                Encomendas
                             </x-nav-link>
                         @endif
                     @endauth
@@ -104,6 +109,11 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="url('/')" :active="request()->is('/')">Vitrine</x-responsive-nav-link>
+
+            {{-- NOVO: Carrinho (público) --}}
+            @if(Route::has('cart.index'))
+                <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">Carrinho</x-responsive-nav-link>
+            @endif
 
             @auth
                 {{-- DASHBOARD: só adm/gerente --}}

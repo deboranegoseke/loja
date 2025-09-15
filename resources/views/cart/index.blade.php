@@ -1,6 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Carrinho</h2>
+        <h6>resources\views\cart\index.blade.php</h6>
     </x-slot>
 
     <div class="py-6">

@@ -1,6 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Meus pedidos</h2>
+        <h6>resources\views\customer\orders\index.blade.php</h6>
     </x-slot>
 
     <div class="py-6">
@@ -40,7 +41,7 @@
                                         <td class="py-3 pr-4">{{ $o->created_at?->format('d/m/Y H:i') }}</td>
                                         <td class="py-3 pr-4">
                                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs {{ $badge }}">
-                                                {{ ucfirst($o->status) }}
+                                                {{ $o->status_label }}
                                             </span>
                                         </td>
                                         <td class="py-3 pr-4">

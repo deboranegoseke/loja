@@ -4,6 +4,8 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ $product->name }}
             </h2>
+            <h6>resources\views\produto\show.blade.php</h6>
+            {{-- Voltar para a vitrine --}}
             <a href="{{ url('/') }}" class="text-sm text-indigo-600 hover:text-indigo-800">← Voltar para a vitrine</a>
         </div>
     </x-slot>

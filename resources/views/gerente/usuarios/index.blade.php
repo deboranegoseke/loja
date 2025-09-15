@@ -3,6 +3,7 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Gestão de Usuários
         </h2>
+        <h6>resources\views\gerente\usuarios\index.blade.php</h6>
     </x-slot>
 
     <div class="py-6">

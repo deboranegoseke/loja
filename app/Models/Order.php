@@ -23,28 +23,43 @@ class Order extends Model
         'total' => 'decimal:2',
     ];
 
+    // Se você quiser que o label apareça também em toArray()/JSON, deixe 'status_label' aqui:
+    protected $appends = ['status_label'];
 
+    // --- Relacionamentos ---
     public function tickets()
     {
         return $this->hasMany(SupportTicket::class);
     }
 
-
     public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
-    public function user()
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    // --- Helpers ---
     public function isPaid(): bool
     {
         return $this->status === 'paid';
     }
 
-    // Label amigável do rastreio
+    // Label PT-BR do PAGAMENTO
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'pending'   => 'Pendente',
+            'paid'      => 'Pago',
+            'cancelled' => 'Cancelado',
+            default     => ucfirst((string) $this->status),
+        };
+    }
+
+    // Label do RASTREIO
     public function getFulfillmentStatusLabelAttribute(): string
     {
         return match ($this->fulfillment_status) {
@@ -58,7 +73,7 @@ class Order extends Model
         };
     }
 
-    // Classe visual (badge)
+    // Classe visual (badge) do RASTREIO
     public function getFulfillmentBadgeClassAttribute(): string
     {
         return match ($this->fulfillment_status) {

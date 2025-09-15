@@ -4,6 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Pedido #{{ $order->id }}
             </h2>
+            <h6>resources\views\customer\orders\show.blade.php
             <a href="{{ route('cliente.pedidos.index') }}" class="text-sm text-gray-600 hover:text-gray-900">← Voltar</a>
         </div>
     </x-slot>

@@ -7,6 +7,7 @@
                     Pedido #{{ $ticket->order_id }}
                     <span class="text-gray-400 text-sm">· Protocolo #{{ $ticket->id }}</span>
                 </h2>
+                <h6>  resources\views\customer\sac\show.blade.php</h6>
                 <div class="flex items-center gap-2">
                     @php
                         $badge = $ticket->status === 'open'

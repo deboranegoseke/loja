@@ -1,22 +1,62 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Produtos</h2>
+            <div>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Produtos</h2>
+                <h6>resources\views\adm\produtos\index.blade.php</h6>
+            </div>
             <a href="{{ route('adm.produtos.create') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
                 Novo produto
             </a>
         </div>
     </x-slot>
 
+    @php
+        $q      = request('q');
+        $active = request('active'); // '1', '0' ou null
+        $stock  = request('stock');  // 'in', 'out' ou null
+    @endphp
+
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            @if (session('status'))
+            @if (session('success') || session('status'))
                 <div class="mb-4 rounded-lg bg-green-50 text-green-800 px-4 py-3 border border-green-200">
-                    {{ session('status') }}
+                    {{ session('success') ?? session('status') }}
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-4 rounded-lg bg-red-50 text-red-800 px-4 py-3 border border-red-200">
+                    {{ session('error') }}
                 </div>
             @endif
 
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                {{-- Filtros (mesmo padrão da tela de pedidos do gerente) --}}
+                <form method="GET" class="p-4 grid grid-cols-1 sm:grid-cols-5 gap-3 border-b">
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ $q }}"
+                        placeholder="Buscar: nome, SKU"
+                        class="sm:col-span-2 rounded-md border-gray-300"
+                    />
+
+                    <select name="active" class="rounded-md border-gray-300">
+                        <option value="">Ativo (todos)</option>
+                        <option value="1" @selected($active === '1')>Ativos</option>
+                        <option value="0" @selected($active === '0')>Inativos</option>
+                    </select>
+
+                    <select name="stock" class="rounded-md border-gray-300">
+                        <option value="">Estoque (todos)</option>
+                        <option value="in"  @selected($stock === 'in')>Com estoque</option>
+                        <option value="out" @selected($stock === 'out')>Sem estoque</option>
+                    </select>
+
+                    <x-primary-button class="justify-center">Filtrar</x-primary-button>
+                </form>
+
                 <div class="p-0 overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -63,6 +103,7 @@
                         </tbody>
                     </table>
                 </div>
+
                 <div class="px-4 py-3">{{ $products->links() }}</div>
             </div>
         </div>
