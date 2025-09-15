@@ -42,7 +42,7 @@
                                 <th class="py-2 pr-4">Total</th>
                                 <th class="py-2 pr-4">Pagamento</th>
                                 <th class="py-2 pr-4">Rastreio</th>
-                                <th class="py-2 pr-4">Código</th>
+                                {{-- removido: <th class="py-2 pr-4">Código</th> --}}
                                 <th class="py-2 pr-4 w-64">Atualizar</th>
                             </tr>
                         </thead>
@@ -74,19 +74,10 @@
                                             {{ $o->fulfillment_status_label }}
                                         </span>
                                     </td>
-                                    <td class="py-3 pr-4">
-                                        <span class="text-xs font-mono">{{ $o->tracking_code ?: '—' }}</span>
-                                    </td>
+                                    {{-- Atualização (sem select de pagamento e sem input de código) --}}
                                     <td class="py-3 pr-4">
                                         <form method="POST" action="{{ route('gerente.pedidos.update', $o) }}" class="flex flex-col gap-2 sm:flex-row sm:items-center">
                                             @csrf @method('PATCH')
-                                            {{-- pagamento (opcional) --}}
-                                            <select name="status" class="rounded-md border-gray-300 text-xs">
-                                                <option value="">Pagamento</option>
-                                                @foreach ($paymentStatuses as $k => $v)
-                                                    <option value="{{ $k }}" @selected($o->status === $k)>{{ $v }}</option>
-                                                @endforeach
-                                            </select>
 
                                             {{-- rastreio --}}
                                             <select name="fulfillment_status" class="rounded-md border-gray-300 text-xs">
@@ -95,17 +86,12 @@
                                                 @endforeach
                                             </select>
 
-                                            {{-- código de rastreio --}}
-                                            <input type="text" name="tracking_code" value="{{ old('tracking_code', $o->tracking_code) }}"
-                                                   placeholder="Código"
-                                                   class="rounded-md border-gray-300 text-xs w-32">
-
                                             <x-primary-button class="text-xs px-3 py-2">Salvar</x-primary-button>
                                         </form>
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="8" class="py-6 text-center text-gray-500">Nenhum pedido encontrado.</td></tr>
+                                <tr><td colspan="7" class="py-6 text-center text-gray-500">Nenhum pedido encontrado.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
