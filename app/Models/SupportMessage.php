@@ -30,9 +30,4 @@ class SupportMessage extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function messages()
-    {
-        return $this->hasMany(\App\Models\SupportMessage::class)->orderBy('created_at');
-    }
 }

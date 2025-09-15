@@ -27,7 +27,7 @@ Route::get('/dashboard', fn() => view('dashboard'))
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// Perfil
+// Perfil (logado)
 Route::middleware('auth')->group(function () {
     Route::get('/profile',  [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -47,13 +47,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/pedidos/{pedido}',   [CustomerOrderController::class, 'show'])->name('cliente.pedidos.show');
         Route::get('/rastreio/{code}',    [CustomerOrderController::class, 'track'])->name('cliente.pedidos.track');
 
-        // SAC (atrelado a pedidos)
-        Route::prefix('sac')->name('cliente.sac.')->group(function () {
-            Route::get('/',               [SupportTicketController::class, 'index'])->name('index');
-            Route::get('/novo/{order}',   [SupportTicketController::class, 'create'])->whereNumber('order')->name('create');
-            Route::post('/',              [SupportTicketController::class, 'store'])->name('store');
-            Route::get('/{ticket}',       [SupportTicketController::class, 'show'])->whereNumber('ticket')->name('show');
-            Route::patch('/{ticket}',     [SupportTicketController::class, 'update'])->whereNumber('ticket')->name('update');
+        Route::middleware(['auth', 'verified', 'role:cliente|adm|gerente'])->group(function () {
+            Route::prefix('sac')->name('cliente.sac.')->group(function () {
+                Route::get('/',                 [SupportTicketController::class, 'index'])->name('index');
+                Route::get('/novo/{order}',     [SupportTicketController::class, 'create'])->whereNumber('order')->name('create');
+                Route::post('/',                [SupportTicketController::class, 'store'])->name('store');
+                Route::get('/{ticket}',         [SupportTicketController::class, 'show'])->whereNumber('ticket')->name('show');
+                Route::post('/{ticket}/reply',  [SupportTicketController::class, 'reply'])->whereNumber('ticket')->name('reply');
+                Route::post('/{ticket}/close',  [SupportTicketController::class, 'close'])
+                    ->whereNumber('ticket')->name('close')->middleware('role:gerente|adm');
+            });
         });
     });
 
@@ -99,17 +102,3 @@ Route::middleware('auth')->group(function () {
     Route::get('/pagamento/pix/{order}', [PaymentController::class, 'show'])->name('pix.show');
     Route::post('/pagamento/pix/{order}/confirmar', [PaymentController::class, 'confirm'])->name('pix.confirm');
 });
-
-
-
-// ... (dentro do grupo com ['auth','verified','role:cliente|adm|gerente'])
-Route::get('/sac',                 [SupportTicketController::class, 'index'])->name('cliente.sac.index');
-Route::get('/sac/novo/{order}',    [SupportTicketController::class, 'create'])->name('cliente.sac.create');
-Route::post('/sac',                [SupportTicketController::class, 'store'])->name('cliente.sac.store');
-Route::get('/sac/{ticket}',        [SupportTicketController::class, 'show'])->name('cliente.sac.show');
-Route::post('/sac/{ticket}/reply', [SupportTicketController::class, 'reply'])->name('cliente.sac.reply');
-
-// ⬇️ ESTA AQUI É A QUE FALTAVA
-Route::post('/sac/{ticket}/close', [SupportTicketController::class, 'close'])->name('cliente.sac.close');
-// (se preferir, pode restringir mais)
-// ->middleware('role:gerente|adm');

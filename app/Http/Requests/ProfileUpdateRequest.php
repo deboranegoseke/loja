@@ -8,11 +8,6 @@ use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -30,6 +25,7 @@ class ProfileUpdateRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return in_array($this->user()?->role, [User::ROLE_GERENTE, User::ROLE_ADM], true);
+        // Permite que QUALQUER usuário autenticado atualize o próprio perfil.
+        return $this->user() !== null;
     }
 }
