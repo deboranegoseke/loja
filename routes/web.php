@@ -113,3 +113,23 @@ Route::prefix('gerente')->as('gerente.')->middleware('role:gerente')->group(func
         Route::get('/', [ReportController::class, 'index'])->name('index');
     });
 });
+
+// Endereços (todos os perfis, apenas o dono edita/visualiza)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('enderecos', \App\Http\Controllers\AddressController::class)
+        ->parameters(['enderecos' => 'endereco'])
+        ->names('enderecos')
+        ->except(['show']);
+});
+
+// Checkout e Pagamento (endereço obrigatório)
+Route::middleware(['auth', 'address.required'])->group(function () {
+    Route::post('/checkout', [\App\Http\Controllers\Store\CheckoutController::class, 'store'])
+        ->name('checkout.store');
+
+    Route::get('/pagamento/pix/{order}', [\App\Http\Controllers\Store\PaymentController::class, 'show'])
+        ->name('pix.show');
+
+    Route::post('/pagamento/pix/{order}/confirmar', [\App\Http\Controllers\Store\PaymentController::class, 'confirm'])
+        ->name('pix.confirm');
+});
