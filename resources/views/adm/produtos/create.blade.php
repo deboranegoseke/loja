@@ -36,7 +36,7 @@
                         const c = parseFloat(this.cost) || 0;
                         if (p <= 0) return 0;
                         return Math.max(0, ((p - c) / p) * 100).toFixed(2);
-                    },
+                        },
                     previewSrc() {
                         return this.filePreview || this.url || 'https://picsum.photos/seed/placeholder/240/240';
                     },
@@ -59,8 +59,13 @@
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
+                            {{-- NOVO: SKU --}}
+                            <div>
+                                <x-input-label value="SKU (opcional)" />
+                                <x-text-input name="sku" type="text" class="mt-1 block w-full" maxlength="100" placeholder="Ex.: CAMISETA-001" />
+                                <x-input-error :messages="$errors->get('sku')" class="mt-2" />
+                            </div>
 
-                            
                             <div>
                                 <x-input-label value="Estoque" />
                                 <x-text-input name="stock" x-model="stock" type="number" min="0" step="1" class="mt-1 block w-full" />
