@@ -15,7 +15,7 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="url('/')" :active="request()->is('/')">Vitrine</x-nav-link>
 
-                    {{-- NOVO: Carrinho (público) --}}
+                    {{-- Carrinho (público) --}}
                     @if(Route::has('cart.index'))
                         <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">Carrinho</x-nav-link>
                     @endif
@@ -34,9 +34,24 @@
                             <x-nav-link :href="route('cliente.sac.index')" :active="request()->routeIs('cliente.sac.*')">SAC</x-nav-link>
                         @endif
 
+                        {{-- Catálogo (adm/gerente) --}}
                         @if($user->hasRole(['adm','gerente']) && Route::has('adm.produtos.index'))
                             <x-nav-link :href="route('adm.produtos.index')" :active="request()->routeIs('adm.produtos.*')">Catálogo</x-nav-link>
                         @endif
+
+                        {{-- Novo produto (adm/gerente) --}}
+                        @if($user->hasRole(['adm','gerente']) && Route::has('adm.produtos.create'))
+                            <x-nav-link :href="route('adm.produtos.create')" :active="request()->routeIs('adm.produtos.create')">
+                                Novo produto
+                            </x-nav-link>
+                        @endif
+
+                        {{-- Relatórios (somente gerente) --}}
+                        @if($user->hasRole('gerente') && Route::has('gerente.relatorios.index'))
+                            <x-nav-link :href="route('gerente.relatorios.index')" :active="request()->routeIs('gerente.relatorios.*')">
+                                Relatórios
+                            </x-nav-link>
+                        @endif>
 
                         @if($user->hasRole('gerente') && Route::has('gerente.usuarios.index'))
                             <x-nav-link :href="route('gerente.usuarios.index')" :active="request()->routeIs('gerente.usuarios.*')">Usuários</x-nav-link>
@@ -54,7 +69,6 @@
             <!-- Direita -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @auth
-                    <!-- Settings Dropdown -->
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition">
@@ -110,13 +124,11 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="url('/')" :active="request()->is('/')">Vitrine</x-responsive-nav-link>
 
-            {{-- NOVO: Carrinho (público) --}}
             @if(Route::has('cart.index'))
                 <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">Carrinho</x-responsive-nav-link>
             @endif
 
             @auth
-                {{-- DASHBOARD: só adm/gerente --}}
                 @if($user->hasRole(['adm','gerente']))
                     <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-responsive-nav-link>
                 @endif
@@ -129,8 +141,23 @@
                     <x-responsive-nav-link :href="route('cliente.sac.index')" :active="request()->routeIs('cliente.sac.*')">SAC</x-responsive-nav-link>
                 @endif
 
+                {{-- Catálogo (adm/gerente) --}}
                 @if($user->hasRole(['adm','gerente']) && Route::has('adm.produtos.index'))
                     <x-responsive-nav-link :href="route('adm.produtos.index')" :active="request()->routeIs('adm.produtos.*')">Catálogo</x-responsive-nav-link>
+                @endif
+
+                {{-- Novo produto (adm/gerente) --}}
+                @if($user->hasRole(['adm','gerente']) && Route::has('adm.produtos.create'))
+                    <x-responsive-nav-link :href="route('adm.produtos.create')" :active="request()->routeIs('adm.produtos.create')">
+                        Novo produto
+                    </x-responsive-nav-link>
+                @endif
+
+                {{-- Relatórios (somente gerente) --}}
+                @if($user->hasRole('gerente') && Route::has('gerente.relatorios.index'))
+                    <x-responsive-nav-link :href="route('gerente.relatorios.index')" :active="request()->routeIs('gerente.relatorios.*')">
+                        Relatórios
+                    </x-responsive-nav-link>
                 @endif
 
                 @if($user->hasRole('gerente') && Route::has('gerente.usuarios.index'))
@@ -139,7 +166,7 @@
 
                 @if($user->hasRole('gerente') && Route::has('gerente.pedidos.index'))
                     <x-responsive-nav-link :href="route('gerente.pedidos.index')" :active="request()->routeIs('gerente.pedidos.*')">
-                        Pedidos (gerente)
+                        Encomendas
                     </x-responsive-nav-link>
                 @endif
             @endauth

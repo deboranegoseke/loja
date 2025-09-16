@@ -12,6 +12,7 @@ use App\Http\Controllers\Store\CheckoutController;
 use App\Http\Controllers\Store\PaymentController;
 use App\Http\Controllers\Gerente\OrderController as ManagerOrderController;
 use App\Models\Product;
+use App\Http\Controllers\Gerente\ReportController;
 
 // Página inicial (única, com produtos)
 Route::get('/', function () {
@@ -101,4 +102,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/pagamento/pix/{order}', [PaymentController::class, 'show'])->name('pix.show');
     Route::post('/pagamento/pix/{order}/confirmar', [PaymentController::class, 'confirm'])->name('pix.confirm');
+});
+
+
+
+Route::prefix('gerente')->as('gerente.')->middleware('role:gerente')->group(function () {
+    // ... suas rotas já existentes
+
+    Route::prefix('relatorios')->as('relatorios.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+    });
 });
