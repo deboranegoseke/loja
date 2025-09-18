@@ -1,78 +1,105 @@
+{{-- resources/views/layouts/navigation.blade.php --}}
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+    <style>[x-cloak]{display:none!important}</style>
+
+    @php
+        /** @var \App\Models\User|null $user */
+        $user = auth()->user();
+        $roleLabel = match($user?->role) {
+            'gerente' => 'Gerente',
+            'adm'     => 'Adm',
+            'cliente' => 'Cliente',
+            default   => null,
+        };
+    @endphp
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ url('/') }}" title="Vitrine">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
-                </div>
+                {{-- sem logo/ícone --}}
 
-                @php($user = auth()->user())
+                {{-- DESKTOP --}}
+                <div class="hidden sm:flex sm:items-center sm:-my-px space-x-8">
 
-                <!-- Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="url('/')" :active="request()->is('/')">Vitrine</x-nav-link>
+                    {{-- CARRINHO (submenu) --}}
+                    <div x-data="{drop:false}" @mouseenter="drop=true" @mouseleave="drop=false" class="relative sm:flex sm:items-center">
+                        <x-nav-link class="h-16" :href="route('cart.index')" :active="request()->routeIs('cart.*')">
+                            Carrinho
+                        </x-nav-link>
+                        <div x-cloak x-show="drop" class="absolute left-0 mt-2 w-56 rounded-md bg-white shadow border z-50">
+                            <div class="py-1">
+                                @auth
+                                    @if(Route::has('cliente.pedidos.index'))
+                                        <a href="{{ route('cliente.pedidos.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-50">Meus pedidos</a>
+                                    @endif
+                                    @if(Route::has('enderecos.index'))
+                                        <a href="{{ route('enderecos.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-50">Cadastro endereço</a>
+                                    @endif
+                                @else
+                                    <a href="{{ route('login') }}" class="block px-4 py-2 text-sm hover:bg-gray-50">Entrar para ver pedidos</a>
+                                @endauth
+                            </div>
+                        </div>
+                    </div>
 
-                    {{-- Carrinho (público) --}}
-                    @if(Route::has('cart.index'))
-                        <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">Carrinho</x-nav-link>
+                    {{-- DASHBOARD --}}
+                    @if($user && $user->hasRole(['adm','gerente']) && Route::has('dashboard'))
+                        <x-nav-link class="h-16" :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link>
                     @endif
 
-                    @auth
-                        {{-- DASHBOARD: só adm/gerente --}}
-                        @if($user->hasRole(['adm','gerente']))
-                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link>
-                        @endif
+                    {{-- ENCOMENDAS --}}
+                    @if($user && $user->hasRole('gerente') && Route::has('gerente.pedidos.index'))
+                        <x-nav-link class="h-16" :href="route('gerente.pedidos.index')" :active="request()->routeIs('gerente.pedidos.*')">Encomendas</x-nav-link>
+                    @endif
 
-                        @if($user->hasRole(['cliente','adm','gerente']) && Route::has('cliente.pedidos.index'))
-                            <x-nav-link :href="route('cliente.pedidos.index')" :active="request()->routeIs('cliente.pedidos.*')">Meus Pedidos</x-nav-link>
-                        @endif
-
-                        @if($user->hasRole(['cliente','adm','gerente']) && Route::has('cliente.sac.index'))
-                            <x-nav-link :href="route('cliente.sac.index')" :active="request()->routeIs('cliente.sac.*')">SAC</x-nav-link>
-                        @endif
-
-                        {{-- Catálogo (adm/gerente) --}}
-                        @if($user->hasRole(['adm','gerente']) && Route::has('adm.produtos.index'))
-                            <x-nav-link :href="route('adm.produtos.index')" :active="request()->routeIs('adm.produtos.*')">Catálogo</x-nav-link>
-                        @endif
-
-                        {{-- Novo produto (adm/gerente) --}}
-                        @if($user->hasRole(['adm','gerente']) && Route::has('adm.produtos.create'))
-                            <x-nav-link :href="route('adm.produtos.create')" :active="request()->routeIs('adm.produtos.create')">
-                                Novo produto
+                    {{-- CATÁLOGO (submenu) --}}
+                    @if($user && $user->hasRole(['adm','gerente']) && Route::has('adm.produtos.index'))
+                        <div x-data="{drop:false}" @mouseenter="drop=true" @mouseleave="drop=false" class="relative sm:flex sm:items-center">
+                            <x-nav-link class="h-16" :href="route('adm.produtos.index')" :active="request()->routeIs('adm.produtos.*')">
+                                Catálogo
                             </x-nav-link>
-                        @endif
+                            <div x-cloak x-show="drop" class="absolute left-0 mt-2 w-56 rounded-md bg-white shadow border z-50">
+                                <div class="py-1">
+                                    @if(Route::has('adm.produtos.create'))
+                                        <a href="{{ route('adm.produtos.create') }}" class="block px-4 py-2 text-sm hover:bg-gray-50">Novo produto</a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
-                        {{-- Relatórios (somente gerente) --}}
-                        @if($user->hasRole('gerente') && Route::has('gerente.relatorios.index'))
-                            <x-nav-link :href="route('gerente.relatorios.index')" :active="request()->routeIs('gerente.relatorios.*')">
-                                Relatórios
-                            </x-nav-link>
-                        @endif>
+                    {{-- RELATÓRIOS --}}
+                    @if($user && $user->hasRole('gerente') && Route::has('gerente.relatorios.index'))
+                        <x-nav-link class="h-16" :href="route('gerente.relatorios.index')" :active="request()->routeIs('gerente.relatorios.*')">Relatórios</x-nav-link>
+                    @endif
 
-                        @if($user->hasRole('gerente') && Route::has('gerente.usuarios.index'))
-                            <x-nav-link :href="route('gerente.usuarios.index')" :active="request()->routeIs('gerente.usuarios.*')">Usuários</x-nav-link>
-                        @endif
+                    {{-- SAC --}}
+                    @if($user && $user->hasRole(['cliente','adm','gerente']) && Route::has('cliente.sac.index'))
+                        <x-nav-link class="h-16" :href="route('cliente.sac.index')" :active="request()->routeIs('cliente.sac.*')">SAC</x-nav-link>
+                    @endif
 
-                        @if($user->hasRole('gerente') && Route::has('gerente.pedidos.index'))
-                            <x-nav-link :href="route('gerente.pedidos.index')" :active="request()->routeIs('gerente.pedidos.*')">
-                                Encomendas
-                            </x-nav-link>
-                        @endif
-                    @endauth
+                    {{-- USUÁRIOS --}}
+                    @if($user && $user->hasRole('gerente') && Route::has('gerente.usuarios.index'))
+                        <x-nav-link class="h-16" :href="route('gerente.usuarios.index')" :active="request()->routeIs('gerente.usuarios.*')">Usuários</x-nav-link>
+                    @endif
+
+                    {{-- VITRINE --}}
+                    <x-nav-link class="h-16" :href="url('/')" :active="request()->is('/')">Vitrine</x-nav-link>
                 </div>
             </div>
 
-            <!-- Direita -->
+            {{-- PERFIL / LOGIN (direita) --}}
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @auth
-                    <x-dropdown align="right" width="48">
+                    <x-dropdown align="right" width="56">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition">
-                                <div>{{ $user?->name }}</div>
+                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition" title="Perfil">
+                                <div>
+                                    {{ $user?->name }}
+                                    @if($roleLabel)
+                                        <span class="ml-1 text-xs text-gray-500">({{ $roleLabel }})</span>
+                                    @endif
+                                </div>
                                 <div class="ms-1">
                                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -80,14 +107,11 @@
                                 </div>
                             </button>
                         </x-slot>
-
                         <x-slot name="content">
                             <x-dropdown-link :href="route('profile.edit')">Perfil</x-dropdown-link>
-
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
                                     Sair
                                 </x-dropdown-link>
                             </form>
@@ -105,9 +129,9 @@
                 @endguest
             </div>
 
-            <!-- Hamburger -->
+            {{-- BOTÃO HAMBURGUER (mobile) --}}
             <div class="-mr-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition">
+                <button @click="open = ! open" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition" aria-label="Abrir menu">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M4 6h16M4 12h16M4 18h16"/>
@@ -119,80 +143,82 @@
         </div>
     </div>
 
-    <!-- Menu responsivo -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    {{-- MOBILE --}}
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden" x-data="{ cartOpen:false, catalogOpen:false }">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="url('/')" :active="request()->is('/')">Vitrine</x-responsive-nav-link>
+            {{-- Carrinho (grupo) --}}
+            <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')" @click.prevent="cartOpen=!cartOpen">
+                Carrinho
+            </x-responsive-nav-link>
+            <div x-show="cartOpen" x-cloak class="pl-4 space-y-1">
+                @auth
+                    @if(Route::has('cliente.pedidos.index'))
+                        <x-responsive-nav-link :href="route('cliente.pedidos.index')" :active="request()->routeIs('cliente.pedidos.*')">Meus pedidos</x-responsive-nav-link>
+                    @endif
+                    @if(Route::has('enderecos.index'))
+                        <x-responsive-nav-link :href="route('enderecos.index')" :active="request()->routeIs('enderecos.*')">Cadastro endereço</x-responsive-nav-link>
+                    @endif
+                @endauth
+            </div>
 
-            @if(Route::has('cart.index'))
-                <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">Carrinho</x-responsive-nav-link>
+            {{-- Dashboard --}}
+            @if($user && $user->hasRole(['adm','gerente']) && Route::has('dashboard'))
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-responsive-nav-link>
             @endif
 
-            @auth
-                @if($user->hasRole(['adm','gerente']))
-                    <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-responsive-nav-link>
-                @endif
+            {{-- Encomendas --}}
+            @if($user && $user->hasRole('gerente') && Route::has('gerente.pedidos.index'))
+                <x-responsive-nav-link :href="route('gerente.pedidos.index')" :active="request()->routeIs('gerente.pedidos.*')">Encomendas</x-responsive-nav-link>
+            @endif
 
-                @if($user->hasRole(['cliente','adm','gerente']) && Route::has('cliente.pedidos.index'))
-                    <x-responsive-nav-link :href="route('cliente.pedidos.index')" :active="request()->routeIs('cliente.pedidos.*')">Meus Pedidos</x-responsive-nav-link>
-                @endif
+            {{-- Catálogo (grupo) --}}
+            @if($user && $user->hasRole(['adm','gerente']) && Route::has('adm.produtos.index'))
+                <x-responsive-nav-link :href="route('adm.produtos.index')" :active="request()->routeIs('adm.produtos.*')" @click.prevent="catalogOpen=!catalogOpen">
+                    Catálogo
+                </x-responsive-nav-link>
+                <div x-show="catalogOpen" x-cloak class="pl-4 space-y-1">
+                    @if(Route::has('adm.produtos.create'))
+                        <x-responsive-nav-link :href="route('adm.produtos.create')" :active="request()->routeIs('adm.produtos.create')">Novo produto</x-responsive-nav-link>
+                    @endif
+                </div>
+            @endif
 
-                @if($user->hasRole(['cliente','adm','gerente']) && Route::has('cliente.sac.index'))
-                    <x-responsive-nav-link :href="route('cliente.sac.index')" :active="request()->routeIs('cliente.sac.*')">SAC</x-responsive-nav-link>
-                @endif
+            {{-- Relatórios --}}
+            @if($user && $user->hasRole('gerente') && Route::has('gerente.relatorios.index'))
+                <x-responsive-nav-link :href="route('gerente.relatorios.index')" :active="request()->routeIs('gerente.relatorios.*')">Relatórios</x-responsive-nav-link>
+            @endif
 
-                {{-- Catálogo (adm/gerente) --}}
-                @if($user->hasRole(['adm','gerente']) && Route::has('adm.produtos.index'))
-                    <x-responsive-nav-link :href="route('adm.produtos.index')" :active="request()->routeIs('adm.produtos.*')">Catálogo</x-responsive-nav-link>
-                @endif
+            {{-- SAC --}}
+            @if($user && $user->hasRole(['cliente','adm','gerente']) && Route::has('cliente.sac.index'))
+                <x-responsive-nav-link :href="route('cliente.sac.index')" :active="request()->routeIs('cliente.sac.*')">SAC</x-responsive-nav-link>
+            @endif
 
-                {{-- Novo produto (adm/gerente) --}}
-                @if($user->hasRole(['adm','gerente']) && Route::has('adm.produtos.create'))
-                    <x-responsive-nav-link :href="route('adm.produtos.create')" :active="request()->routeIs('adm.produtos.create')">
-                        Novo produto
-                    </x-responsive-nav-link>
-                @endif
+            {{-- Usuários --}}
+            @if($user && $user->hasRole('gerente') && Route::has('gerente.usuarios.index'))
+                <x-responsive-nav-link :href="route('gerente.usuarios.index')" :active="request()->routeIs('gerente.usuarios.*')">Usuários</x-responsive-nav-link>
+            @endif
 
-                {{-- Relatórios (somente gerente) --}}
-                @if($user->hasRole('gerente') && Route::has('gerente.relatorios.index'))
-                    <x-responsive-nav-link :href="route('gerente.relatorios.index')" :active="request()->routeIs('gerente.relatorios.*')">
-                        Relatórios
-                    </x-responsive-nav-link>
-                @endif
-
-                @if($user->hasRole('gerente') && Route::has('gerente.usuarios.index'))
-                    <x-responsive-nav-link :href="route('gerente.usuarios.index')" :active="request()->routeIs('gerente.usuarios.*')">Usuários</x-responsive-nav-link>
-                @endif
-
-                @if($user->hasRole('gerente') && Route::has('gerente.pedidos.index'))
-                    <x-responsive-nav-link :href="route('gerente.pedidos.index')" :active="request()->routeIs('gerente.pedidos.*')">
-                        Encomendas
-                    </x-responsive-nav-link>
-                @endif
-            @endauth
-
-            @guest
-                <x-responsive-nav-link :href="route('login')">Entrar</x-responsive-nav-link>
-                @if (Route::has('register'))
-                    <x-responsive-nav-link :href="route('register')">Cadastrar</x-responsive-nav-link>
-                @endif
-            @endguest
+            {{-- Vitrine --}}
+            <x-responsive-nav-link :href="url('/')" :active="request()->is('/')">Vitrine</x-responsive-nav-link>
         </div>
 
         @auth
             <div class="pt-4 pb-1 border-t border-gray-200">
                 <div class="px-4">
-                    <div class="font-medium text-base text-gray-800">{{ $user?->name }}</div>
+                    <div class="font-medium text-base text-gray-800">
+                        {{ $user?->name }}
+                        @if($roleLabel)
+                            <span class="ml-1 text-xs text-gray-500">({{ $roleLabel }})</span>
+                        @endif
+                    </div>
                     <div class="font-medium text-sm text-gray-500">{{ $user?->email }}</div>
                 </div>
 
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link :href="route('profile.edit')">Perfil</x-responsive-nav-link>
-
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault(); this.closest('form').submit();">
+                        <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
                             Sair
                         </x-responsive-nav-link>
                     </form>
