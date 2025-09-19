@@ -41,7 +41,6 @@ class OrderController extends Controller
             'aguardando'  => 'Aguardando',
             'separacao'    => 'Separação',
             'em_transito'  => 'Em trânsito',
-            'rota_entrega' => 'Rota de entrega',
             'entregue'     => 'Entregue',
             'problema'     => 'Ocorrência',
             'cancelado'    => 'Cancelado',

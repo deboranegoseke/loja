@@ -16,7 +16,7 @@ use App\Http\Controllers\Gerente\ReportController;
 
 // Página inicial (única, com produtos)
 Route::get('/', function () {
-    $produtos = Product::where('active', true)->latest()->take(12)->get();
+    $produtos = Product::where('active', true)->latest()->take(10000)->get();
     return view('welcome', compact('produtos'));
 });
 

@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout> 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Carrinho</h2>
         <h6>resources\views\cart\index.blade.php</h6>
@@ -66,12 +66,19 @@
                         @endif
                     </div>
                 @else
-                    <form method="POST" action="{{ route('checkout.store') }}" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        @csrf
-                        <input type="text"  name="name"  value="{{ old('name', auth()->user()->name) }}"  class="rounded-md border-gray-300 sm:col-span-1">
-                        <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" class="rounded-md border-gray-300 sm:col-span-1">
-                        <x-primary-button class="sm:col-span-1 justify-center bg-pink-600 hover:bg-pink-700">Pagar com Pix</x-primary-button>
-                    </form>
+                    <div class="mt-6 flex flex-wrap items-center gap-3">
+                        <form method="POST" action="{{ route('checkout.store') }}">
+                            @csrf
+                            <x-primary-button class="justify-center bg-pink-600 hover:bg-pink-700">
+                                Pagar com Pix
+                            </x-primary-button>
+                        </form>
+
+                        <a href="{{ url('/') }}"
+                           class="inline-flex items-center rounded-md border px-5 py-3 text-sm font-semibold hover:bg-gray-50">
+                           Continuar comprando
+                        </a>
+                    </div>
                 @endguest
             </div>
             @endif

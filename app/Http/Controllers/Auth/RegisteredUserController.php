@@ -27,24 +27,35 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+    // app/Http/Controllers/Auth/RegisteredUserController.php
+
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+        $validated = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Cria como cliente por padrão (tua migration já define 'cliente' como default, mas deixo explícito)
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role'     => 'cliente',
         ]);
 
         event(new Registered($user));
-
         Auth::login($user);
+        $request->session()->regenerate();
 
-        return redirect(route('dashboard', absolute: false));
+        // Se for staff (gerente/adm) vai pro dashboard; senão vai pra vitrine
+        $isStaff = method_exists($user, 'hasRole')
+            ? ($user->hasRole('gerente') || $user->hasRole('adm'))
+            : in_array($user->role, ['gerente', 'adm'], true);
+
+        return $isStaff
+            ? redirect()->intended(route('dashboard'))
+            : redirect()->intended(url('/'));
     }
 }

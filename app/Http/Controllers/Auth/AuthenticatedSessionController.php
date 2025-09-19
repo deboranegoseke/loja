@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Exibe o formulário de login.
      */
     public function create(): View
     {
@@ -20,7 +20,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Processa o login.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -29,18 +29,18 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        // Staff (gerente/adm): mantém intended e vai para o dashboard
+        // GERENTE / ADM: podem ir para a URL "pretendida" (ex.: dashboard)
         if ($user && ($user->hasRole('gerente') || $user->hasRole('adm'))) {
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(route('dashboard', absolute: false));
         }
 
-        // Cliente: IGNORA qualquer intended (ex.: /dashboard salvo na sessão)
-        $request->session()->forget('url.intended');
-        return redirect()->to('/'); // ou ->route('cliente.pedidos.index')
+        // CLIENTE: ignora a URL "pretendida" e vai SEMPRE para a vitrine
+        $request->session()->forget('url.intended'); // garante que não vai reaproveitar /dashboard
+        return redirect('/'); // resources/views/welcome.blade.php
     }
 
     /**
-     * Destroy an authenticated session.
+     * Faz logout.
      */
     public function destroy(Request $request): RedirectResponse
     {

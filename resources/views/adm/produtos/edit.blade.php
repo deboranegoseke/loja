@@ -83,7 +83,7 @@
                                     type="text"
                                     class="mt-1 block w-full"
                                     maxlength="100"
-                                    placeholder="Ex.: CAMISETA-001"
+                                    placeholder="Ex.: 1256"
                                 />
                                 <x-input-error :messages="$errors->get('sku')" class="mt-2" />
                             </div>

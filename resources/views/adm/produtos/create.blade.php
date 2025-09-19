@@ -61,8 +61,8 @@
 
                             {{-- NOVO: SKU --}}
                             <div>
-                                <x-input-label value="SKU (opcional)" />
-                                <x-text-input name="sku" type="text" class="mt-1 block w-full" maxlength="100" placeholder="Ex.: CAMISETA-001" />
+                                <x-input-label value="SKU" />
+                                <x-text-input name="sku" type="text" class="mt-1 block w-full" maxlength="100" placeholder="Ex.:12584" />
                                 <x-input-error :messages="$errors->get('sku')" class="mt-2" />
                             </div>
 
