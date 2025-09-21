@@ -124,7 +124,7 @@ class SupportTicketController extends Controller
         if (!$isStaff) {
             abort_unless($ticket->user_id === $user->id, 403);
         }
-        if ($ticket->status === 'closed') {
+        if ($ticket->status === 'closedinto') {
             abort(403);
         }
 

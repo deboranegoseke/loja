@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">SAC</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Suporte</h2>
         <h6>resources\views\customer\sac\index.blade.php</h6>
     </x-slot>
 
@@ -34,13 +34,9 @@
                     <x-primary-button class="justify-center">Filtrar</x-primary-button>
                 </form>
 
-                <p class="text-sm text-gray-600 mb-4">
-                    Para abrir um chamado, acesse
-                    <a href="{{ route('cliente.pedidos.index') }}" class="text-pink-600 hover:underline">Meus pedidos</a>
-                    e clique em <b>Abrir SAC</b> no pedido desejado.
-                </p>
 
-                @if ($tickets->isEmpty())
+
+                @if ($tickets->count() === 0)
                     <p class="text-gray-600">Nenhum chamado ainda.</p>
                 @else
                     <div class="overflow-x-auto">
@@ -58,11 +54,15 @@
                             <tbody class="divide-y">
                                 @foreach ($tickets as $t)
                                     @php
-                                        $badge = match($t->status) {
-                                            'open'     => 'bg-yellow-100 text-yellow-800',
-                                            'answered' => 'bg-blue-100 text-blue-800',
-                                            'closed'   => 'bg-gray-200 text-gray-700',
-                                            default    => 'bg-gray-100 text-gray-800'
+                                        // normaliza para comparação estrita do match
+                                        $statusNorm = strtolower(trim((string) $t->status));
+
+                                        // aceita PT e EN para não quebrar se vier "aberto/respondido/fechado"
+                                        $badge = match ($statusNorm) {
+                                            'open', 'aberto'         => 'bg-green-200 text-black',
+                                            'answered', 'respondido' => 'bg-blue-100 text-blue-800',
+                                            'closed', 'fechado'      => 'bg-red-200 text-black',
+                                            default                  => 'bg-gray-100 text-gray-800',
                                         };
                                     @endphp
                                     <tr>

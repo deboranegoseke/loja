@@ -40,15 +40,16 @@ class SupportTicket extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(SupportMessage::class, 'support_ticket_id')
-                    ->orderBy('created_at');
+            ->orderBy('created_at');
     }
 
     // --- ACCESSORS ---
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            'open'     => 'Aberto',
-            'answered' => 'Respondido',
+            // 'Open' grava no BD e na view aparece 'Aberto'
+            'open'     => 'Aberto', 
+            // 'closed' grava no BD e na view aparece 'Fechado'
             'closed'   => 'Fechado',
             default    => ucfirst((string) $this->status),
         };

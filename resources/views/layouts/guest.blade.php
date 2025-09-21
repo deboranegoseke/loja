@@ -26,5 +26,8 @@
                 {{ $slot }}
             </div>
         </div>
+
+        {{-- Rodapé institucional --}}
+        @include('layouts.footer')
     </body>
 </html>

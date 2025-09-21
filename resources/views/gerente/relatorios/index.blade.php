@@ -60,7 +60,7 @@
                 </div>
             </div>
 
-            {{-- Linha 2: Margem / SAC --}}
+            {{-- Linha 2: Margem / Suporte --}}
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white shadow-sm sm:rounded-lg p-4">
                     <div class="flex items-center justify-between mb-3">
@@ -76,7 +76,7 @@
 
                 <div class="bg-white shadow-sm sm:rounded-lg p-4">
                     <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-semibold">SAC por mês</h3>
+                        <h3 class="font-semibold">Suporte por mês</h3>
                         <span class="text-xs text-gray-500">Abertos / Respondidos / Fechados</span>
                     </div>
                     <canvas id="chartSAC" height="220"></canvas>
@@ -206,7 +206,7 @@
             options: { scales: { y: { beginAtZero: true, ticks: { callback: (v)=> v + ' %' } } } }
         });
 
-        // --- 4) SAC ---
+        // --- 4) Suporte ---
         new Chart(document.getElementById('chartSAC'), {
             type: 'bar',
             data: {
