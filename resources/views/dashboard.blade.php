@@ -116,10 +116,7 @@
             <div class="bg-white overflow-hidden shadow-sm rounded-2xl">
                 <div class="p-5 border-b">
                     <h3 class="text-lg font-semibold">Produtos Esgotados na Vitrine</h3>
-                    <p class="text-sm text-gray-500">
-                        Regras (união): <code>active = 0</code> <strong>OU</strong> <code>stock &le; 10</code>.  
-                        Mostrando <code>SKU</code>, <code>Nome</code>, <code>Estoque</code>, <code>Ativo?</code> e <code>Motivo</code>.
-                    </p>
+
                 </div>
 
                 <div class="p-5 overflow-x-auto">
