@@ -1,0 +1,93 @@
+############################################################
+# APP
+############################################################
+APP_NAME="Lojinha Cupcakes"
+APP_ENV=production
+APP_KEY=base64:IUr+ZkH1KIcJovrmqwU99pgbgzJi4uIcUFErbXCF718=
+APP_DEBUG=false
+APP_URL=https://SEU_DOMINIO.koyeb.app
+
+APP_LOCALE=pt_BR
+APP_FALLBACK_LOCALE=pt_BR
+APP_FAKER_LOCALE=pt_BR
+APP_TIMEZONE=America/Sao_Paulo
+
+APP_MAINTENANCE_DRIVER=file
+PHP_CLI_SERVER_WORKERS=4
+BCRYPT_ROUNDS=12
+
+############################################################
+# LOG
+############################################################
+LOG_CHANNEL=stack
+LOG_LEVEL=info
+LOG_DEPRECATIONS_CHANNEL=null
+
+############################################################
+# BANCO DE DADOS — Koyeb Postgres (via DB_*)
+############################################################
+DB_CONNECTION=pgsql
+DB_HOST=ep-lucky-mountain-a2ewdpvb.eu-central-1.pg.koyeb.app
+DB_PORT=5432
+DB_DATABASE=koyebdb
+DB_USERNAME=lojinha_app
+DB_PASSWORD=npg_Nz5ljhgwpHZ6
+DB_SSLMODE=require
+
+############################################################
+# SESSÃO / QUEUE / CACHE / FILESYSTEM
+############################################################
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+SESSION_PATH=/
+SESSION_DOMAIN=null
+
+BROADCAST_DRIVER=log
+FILESYSTEM_DISK=public
+
+QUEUE_CONNECTION=sync
+CACHE_DRIVER=database
+# CACHE_PREFIX=lojinha_
+
+############################################################
+# REDIS (deixe assim se não usar)
+############################################################
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+############################################################
+# E-MAIL (exemplo Gmail com Senha de App)
+############################################################
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=teste@gmail.com
+MAIL_PASSWORD=
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=teste@gmail.com
+MAIL_FROM_NAME="${APP_NAME}"
+EMAIL_DESTINO=teste@gmail.com
+
+############################################################
+# AWS (não usado aqui)
+############################################################
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+############################################################
+# FRONTEND (Vite)
+############################################################
+VITE_APP_NAME="${APP_NAME}"
+
+############################################################
+# PIX (custom do projeto)
+############################################################
+PIX_KEY="MEU PIX"
+PIX_MERCHANT="Lojinha Cupcakes"
+PIX_CITY="Curitiba"
