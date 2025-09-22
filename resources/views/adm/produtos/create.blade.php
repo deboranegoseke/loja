@@ -4,10 +4,11 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Novo produto
             </h2>
-            <h6>resources\views\adm\produtos\create.blade.php</h6>
+            <h6 class="text-sm text-gray-500">resources\views\adm\produtos\create.blade.php</h6>
             <div class="flex items-center gap-2">
                 @if(Route::has('adm.produtos.index'))
-                    <a href="{{ route('adm.produtos.index') }}" class="inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium hover:bg-gray-50">
+                    <a href="{{ route('adm.produtos.index') }}"
+                       class="inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium hover:bg-gray-50">
                         Voltar ao catálogo
                     </a>
                 @endif
@@ -15,8 +16,8 @@
         </div>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4">
+        <div class="max-w-5xl mx-auto sm:px-4 lg:px-6"> {{-- reduzido de 7xl → 5xl e padding menor --}}
             @if ($errors->any())
                 <div class="mb-4 rounded-lg bg-red-50 text-red-800 px-4 py-3 border border-red-200">
                     {{ $errors->first() }}
@@ -36,7 +37,7 @@
                         const c = parseFloat(this.cost) || 0;
                         if (p <= 0) return 0;
                         return Math.max(0, ((p - c) / p) * 100).toFixed(2);
-                        },
+                    },
                     previewSrc() {
                         return this.filePreview || this.url || 'https://picsum.photos/seed/placeholder/240/240';
                     },
@@ -47,11 +48,12 @@
                 }"
                 class="bg-white overflow-hidden shadow-sm sm:rounded-lg"
             >
-                <div class="p-6">
-                    <form method="POST" action="{{ route('adm.produtos.store') }}" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="p-5"> {{-- reduzido de p-6 → p-5 --}}
+                    <form method="POST" action="{{ route('adm.produtos.store') }}" enctype="multipart/form-data"
+                          class="grid grid-cols-1 lg:grid-cols-3 gap-5">
                         @csrf
 
-                        {{-- Coluna esquerda: campos --}}
+                        {{-- Coluna esquerda --}}
                         <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="md:col-span-2">
                                 <x-input-label value="Nome do produto" />
@@ -59,10 +61,9 @@
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
-                            {{-- NOVO: SKU --}}
                             <div>
                                 <x-input-label value="SKU" />
-                                <x-text-input name="sku" type="text" class="mt-1 block w-full" maxlength="100" placeholder="Ex.:12584" />
+                                <x-text-input name="sku" type="text" class="mt-1 block w-full" maxlength="100" placeholder="Ex.: 12584" />
                                 <x-input-error :messages="$errors->get('sku')" class="mt-2" />
                             </div>
 
@@ -104,7 +105,7 @@
                             </div>
                         </div>
 
-                        {{-- Coluna direita: imagem/preview --}}
+                        {{-- Coluna direita --}}
                         <div>
                             <div class="rounded-lg border border-dashed border-gray-300 p-3">
                                 <div class="aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
@@ -132,7 +133,6 @@
                     </form>
                 </div>
             </div>
-
         </div>
     </div>
 </x-app-layout>

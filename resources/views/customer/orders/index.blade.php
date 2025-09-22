@@ -1,11 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Meus pedidos</h2>
-        <h6>resources\views\customer\orders\index.blade.php</h6>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Meus pedidos</h2>
+            <h6 class="text-gray-400 text-sm hidden sm:block">resources/views/customer/orders/index.blade.php</h6>
+        </div>
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 @if ($orders->isEmpty())
                     <p class="text-gray-600">Você ainda não possui pedidos.</p>
@@ -14,7 +16,7 @@
                     </a>
                 @else
                     <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
+                        <table class="min-w-full text-sm whitespace-nowrap">
                             <thead class="text-left text-gray-500 border-b">
                                 <tr>
                                     <th class="py-2 pr-4">Pedido</th>
@@ -55,29 +57,31 @@
                                         </td>
                                         <td class="py-3 pr-4 font-semibold">R$ {{ number_format($o->total,2,',','.') }}</td>
                                         <td class="py-3 pr-4">
-                                            <a href="{{ route('cliente.pedidos.show', $o) }}"
-                                               class="inline-flex items-center rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-gray-50">
-                                                Detalhes
-                                            </a>
+                                            <div class="flex flex-wrap gap-2">
+                                                <a href="{{ route('cliente.pedidos.show', $o) }}"
+                                                   class="inline-flex items-center rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-gray-50">
+                                                    Detalhes
+                                                </a>
 
-                                            @if ($o->status === 'pending' && Route::has('pix.show'))
-                                                <a href="{{ route('pix.show', $o) }}"
-                                                   class="ml-2 inline-flex items-center rounded-md bg-pink-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-pink-700">
-                                                    Pagar com Pix
-                                                </a>
-                                            @endif
+                                                @if ($o->status === 'pending' && Route::has('pix.show'))
+                                                    <a href="{{ route('pix.show', $o) }}"
+                                                       class="inline-flex items-center rounded-md bg-pink-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-pink-700">
+                                                        Pagar com Pix
+                                                    </a>
+                                                @endif
 
-                                            @if($ticket)
-                                                <a href="{{ route('cliente.sac.show', $ticket) }}"
-                                                   class="ml-2 inline-flex items-center rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-gray-50">
-                                                    Ver SAC
-                                                </a>
-                                            @else
-                                                <a href="{{ route('cliente.sac.create', $o) }}"
-                                                   class="ml-2 inline-flex items-center rounded-md bg-pink-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-pink-700">
-                                                    Abrir SAC
-                                                </a>
-                                            @endif
+                                                @if($ticket)
+                                                    <a href="{{ route('cliente.sac.show', $ticket) }}"
+                                                       class="inline-flex items-center rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-gray-50">
+                                                        Ver SAC
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('cliente.sac.create', $o) }}"
+                                                       class="inline-flex items-center rounded-md bg-pink-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-pink-700">
+                                                        Abrir SAC
+                                                    </a>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach

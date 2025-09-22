@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 namespace App\Http\Controllers\Gerente;
 
@@ -12,7 +12,7 @@ class OrderController extends Controller
     {
         $q           = trim((string) $request->input('q'));
         $status      = $request->input('status');           // pending|paid|cancelled
-        $fulfillment = $request->input('fulfillment');      // separacao|em_transito|rota_entrega|entregue|...
+        $fulfillment = $request->input('fulfillment');      // aguardando|separacao|em_transito|rota_entrega|entregue|problema|cancelado
 
         $orders = Order::query()
             ->with(['user'])
@@ -30,7 +30,7 @@ class OrderController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        // opções para selects
+        // opções para selects (inclui rota_entrega aqui também)
         $paymentStatuses = [
             'pending'   => 'Pendente',
             'paid'      => 'Pago',
@@ -38,9 +38,10 @@ class OrderController extends Controller
         ];
 
         $fulfillmentStatuses = [
-            'aguardando'  => 'Aguardando',
+            'aguardando'   => 'Aguardando',
             'separacao'    => 'Separação',
             'em_transito'  => 'Em trânsito',
+            'rota_entrega' => 'Rota de entrega',
             'entregue'     => 'Entregue',
             'problema'     => 'Ocorrência',
             'cancelado'    => 'Cancelado',
@@ -51,20 +52,47 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
-        // valida apenas os campos permitidos
+        // Deixe fulfillment_status opcional: vamos aplicar a regra automática
         $data = $request->validate([
             'status'             => 'nullable|in:pending,paid,cancelled',
-            'fulfillment_status' => 'required|in:aguardando,separacao,em_transito,rota_entrega,entregue,problema,cancelado',
+            'fulfillment_status' => 'nullable|in:aguardando,separacao,em_transito,rota_entrega,entregue,problema,cancelado',
             'tracking_code'      => 'nullable|string|max:60',
         ]);
 
-        // regra: rastreio só aparece se pago; ainda assim permitimos o gerente ajustar,
-        // mas se marcar "pending" forçamos fulfillment a "aguardando"
-        if (($data['status'] ?? $order->status) !== 'paid') {
-            $data['fulfillment_status'] = 'aguardando';
+        // Estado atual e futuro
+        $novoStatus       = $data['status']             ?? $order->status;
+        $novoFulfillment  = $data['fulfillment_status'] ?? $order->fulfillment_status;
+
+        /**
+         * Regras:
+         * - Se status = paid e fulfillment atual (ou informado) estiver vazio/aguardando → vai para separacao.
+         * - Se status = pending → fulfillment = aguardando.
+         * - Se status = cancelled → fulfillment = cancelado.
+         * - Se já estiver além de separacao (em_transito, rota_entrega, entregue, problema), NUNCA rebaixa.
+         */
+        $estagiosAvancados = ['separacao','em_transito','rota_entrega','entregue','problema','cancelado'];
+
+        if ($novoStatus === 'paid') {
+            if (!$novoFulfillment || $novoFulfillment === 'aguardando') {
+                $novoFulfillment = 'separacao';
+            }
+            // se já for um estágio mais avançado, mantém como está (não faz downgrade)
+        } elseif ($novoStatus === 'pending') {
+            // pagamento pendente volta para aguardando
+            $novoFulfillment = 'aguardando';
+        } elseif ($novoStatus === 'cancelled') {
+            // pedido cancelado deve refletir no fulfillment
+            $novoFulfillment = 'cancelado';
         }
 
-        $order->update($data);
+        // Monta payload final
+        $payload = [
+            'status'             => $novoStatus,
+            'fulfillment_status' => $novoFulfillment,
+            'tracking_code'      => $data['tracking_code'] ?? $order->tracking_code,
+        ];
+
+        $order->update($payload);
 
         return back()->with('status', "Pedido #{$order->id} atualizado.");
     }

@@ -1,21 +1,21 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ $product->name }}
             </h2>
-            <h6 class="text-gray-400 text-sm">resources/views/produto/show.blade.php</h6>
-            <a href="{{ url('/') }}" class="text-sm text-indigo-600 hover:text-indigo-800 transition">← Voltar para a vitrine</a>
+            <h6 class="text-gray-400 text-sm hidden sm:block">resources/views/produto/show.blade.php</h6>
+            <a href="{{ url('/') }}" class="text-sm text-indigo-600 hover:text-indigo-800 transition sm:ml-auto">← Voltar para a vitrine</a>
         </div>
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white shadow-xl sm:rounded-2xl p-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    
+
                     {{-- Imagem do produto --}}
-                    <div class="rounded-2xl overflow-hidden bg-gray-100 shadow-inner">
+                    <div class="rounded-2xl overflow-hidden bg-gray-100 shadow-inner aspect-square">
                         <img
                             src="{{ $product->cover_url }}"
                             alt="{{ $product->name }}"
@@ -51,13 +51,13 @@
                         </div>
 
                         {{-- Ações --}}
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
                             @if($product->stock > 0)
-                                <form method="POST" action="{{ route('cart.add', $product) }}" class="flex items-center gap-3">
+                                <form method="POST" action="{{ route('cart.add', $product) }}" class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
                                     @csrf
                                     <input type="number" name="qty" min="1" value="1"
-                                        class="w-20 rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-500">
-                                    <x-primary-button class="bg-pink-600 hover:bg-pink-700 transition-all duration-200">
+                                        class="w-full sm:w-20 rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-500">
+                                    <x-primary-button class="w-full sm:w-auto bg-pink-600 hover:bg-pink-700 transition-all duration-200">
                                         Adicionar ao carrinho
                                     </x-primary-button>
                                 </form>
@@ -95,7 +95,7 @@
                 @if($related->count())
                     <div class="mt-12">
                         <h3 class="text-xl font-semibold mb-6">Você também pode gostar</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             @foreach ($related as $p)
                                 <article class="group bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
                                     <a href="{{ route('produto.show', $p->slug ?? $p->id) }}">
