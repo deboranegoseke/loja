@@ -1,201 +1,169 @@
+{{-- resources/views/dashboard.blade.php --}}
 <x-app-layout>
-    @php
-        // Fallback global: garante $user disponível em TODO o arquivo
-        $user = $user ?? auth()->user();
-
-        // ===== Defaults seguros para evitar "Undefined variable" =====
-        $receitaHoje       = $receitaHoje       ?? 0;
-        $pedidosPendentes  = $pedidosPendentes  ?? 0;
-        $produtosAtivos    = $produtosAtivos    ?? 0;
-        $ticketsAbertos    = $ticketsAbertos    ?? 0;
-        $usuariosRecentes  = $usuariosRecentes  ?? collect();
-        $ticketsRecentes   = $ticketsRecentes   ?? collect();
-        $ultimosPedidos    = $ultimosPedidos    ?? collect();
-        $temSAC            = $temSAC            ?? false;
-        $temColunaIsActive = $temColunaIsActive ?? false;
-
-        // Helper: checar role sem quebrar se não houver método
-        $temRole = fn($role) => $user && method_exists($user,'hasRole') ? $user->hasRole($role) : false;
-        $temAlgumaRole = fn(array $roles) => $user && method_exists($user,'hasRole') ? $user->hasRole($roles) : false;
-    @endphp
-
     <x-slot name="header">
-        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Dashboard') }}
-            </h2>
-            <h6>resources\views\dashboard.blade.php</h6>
-
-
-        </div>
+        <h2 class="font-semibold text-xl text-gray-900 leading-tight">
+            Dashboard
+        </h2>
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            @if (session('status'))
-                <div class="mb-4 rounded-lg bg-green-50 text-green-800 px-4 py-3 border border-green-200">
-                    {{ session('status') }}
-                </div>
-            @endif
-            @if ($errors->any())
-                <div class="mb-4 rounded-lg bg-red-50 text-red-800 px-4 py-3 border border-red-200">
-                    {{ $errors->first() }}
-                </div>
-            @endif
-
-            {{-- KPIs --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white p-5 rounded-lg shadow-sm border">
-                    <div class="text-sm text-gray-500">Receita (hoje)</div>
-                    <div class="mt-1 text-2xl font-semibold">
-                        R$ {{ number_format($receitaHoje, 2, ',', '.') }}
+            {{-- Cards resumidos --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {{-- Receita do dia (pagos) --}}
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl p-5">
+                    <div class="text-sm text-gray-500">Receita do Dia</div>
+                    <div class="mt-2 text-3xl font-bold">
+                        R$ {{ number_format(($receitaDia ?? 0), 2, ',', '.') }}
                     </div>
+                    <div class="mt-1 text-xs text-gray-400">Somente pedidos pagos</div>
                 </div>
 
-                <div class="bg-white p-5 rounded-lg shadow-sm border">
-                    <div class="text-sm text-gray-500">Pedidos pendentes</div>
-                    <div class="mt-1 text-2xl font-semibold">
-                        {{ $pedidosPendentes }}
+                {{-- Receita do mês (pagos) --}}
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl p-5">
+                    <div class="text-sm text-gray-500">Receita do Mês</div>
+                    <div class="mt-2 text-3xl font-bold">
+                        R$ {{ number_format(($receitaMes ?? 0), 2, ',', '.') }}
                     </div>
+                    <div class="mt-1 text-xs text-gray-400">Somente pedidos pagos</div>
                 </div>
 
-                <div class="bg-white p-5 rounded-lg shadow-sm border">
-                    <div class="text-sm text-gray-500">
-                        {{ $temColunaIsActive ? 'Produtos ativos' : 'Produtos (total)' }}
+                {{-- Produtos Ativos (active = 0) --}}
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl p-5">
+                    <div class="text-sm text-gray-500">Produtos Ativos</div>
+                    <div class="mt-2 text-3xl font-bold">
+                        {{ $qtdProdutosAtivos ?? 0 }}
                     </div>
-                    <div class="mt-1 text-2xl font-semibold">
-                        {{ $produtosAtivos }}
-                    </div>
+                    <div class="mt-1 text-xs text-gray-400">Regra: <code>active = 0</code></div>
                 </div>
 
-                <div class="bg-white p-5 rounded-lg shadow-sm border">
-                    <div class="text-sm text-gray-500">Tickets abertos (SAC)</div>
-                    <div class="mt-1 text-2xl font-semibold">
-                        @if($temSAC) {{ $ticketsAbertos }} @else — @endif
+                {{-- Produtos Esgotados (geral, stock ≤ 10) --}}
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl p-5">
+                    <div class="text-sm text-gray-500">Produtos Esgotados</div>
+                    <div class="mt-2 text-3xl font-bold">
+                        {{ $qtdProdutosEsgotados ?? 0 }}
+                    </div>
+                    <div class="mt-1 text-xs text-gray-400">Regra: <code>stock &le; 10</code> (independente de <code>active</code>)</div>
+                </div>
+
+                {{-- SAC em Aberto --}}
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl p-5">
+                    <div class="text-sm text-gray-500">SAC em Aberto</div>
+                    <div class="mt-2 text-3xl font-bold">
+                        {{ $totalSacAberto ?? 0 }}
+                    </div>
+                    <div class="mt-1 text-xs text-gray-400">Regra: <code>status IN ('open','aberto')</code></div>
+                </div>
+
+                {{-- Pedidos em Separação (contador) --}}
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl p-5">
+                    <div class="text-sm text-gray-500">Pedidos em Separação</div>
+                    <div class="mt-2 text-3xl font-bold">
+                        {{ $qtdPedidosSeparacao ?? (isset($pedidosSeparacao) ? $pedidosSeparacao->count() : 0) }}
+                    </div>
+                    <div class="mt-1 text-xs text-gray-400">
+                        Regra: <code>fulfillment_status = 'separacao'</code>
                     </div>
                 </div>
             </div>
 
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {{-- Coluna esquerda --}}
-                <div class="lg:col-span-8 space-y-6">
-                    {{-- Últimos pedidos --}}
-                    <div class="bg-white rounded-lg shadow-sm border">
-                        <div class="px-6 py-4 border-b">
-                            <h3 class="font-semibold text-gray-800">Últimos pedidos</h3>
-                        </div>
-                        <div class="p-6 overflow-x-auto">
-                            <table class="min-w-full text-sm">
-                                <thead>
-                                    <tr class="text-left text-gray-500">
-                                        <th class="py-2 pr-4">#</th>
-                                        <th class="py-2 pr-4">Cliente</th>
-                                        <th class="py-2 pr-4">Total</th>
-                                        <th class="py-2 pr-4">Status</th>
-                                        <th class="py-2 pr-4">Criado em</th>
-                                        <th class="py-2 pr-4"></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y">
-                                    @forelse($ultimosPedidos as $pedido)
-                                        <tr>
-                                            <td class="py-2 pr-4">{{ $pedido->id }}</td>
-                                            <td class="py-2 pr-4">
-                                                {{ optional($pedido->customer)->name ?? '—' }}
-                                            </td>
-                                            <td class="py-2 pr-4">
-                                                R$ {{ number_format($pedido->total ?? 0, 2, ',', '.') }}
-                                            </td>
-                                            <td class="py-2 pr-4">
-                                                <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs">
-                                                    {{ ucfirst($pedido->status ?? 'desconhecido') }}
-                                                </span>
-                                            </td>
-                                            <td class="py-2 pr-4">
-                                                {{ optional($pedido->created_at)->format('d/m/Y H:i') ?? '—' }}
-                                            </td>
-                                            <td class="py-2 pr-4 text-right">
-                                                @if(Route::has('gerente.pedidos.index'))
-                                                    <a href="{{ route('gerente.pedidos.index') }}"
-                                                       class="text-indigo-600 hover:underline">ver</a>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" class="py-4 text-center text-gray-500">Sem pedidos recentes.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    {{-- Tickets recentes --}}
-                    @if($temAlgumaRole(['adm','gerente']) && $temSAC)
-                        <div class="bg-white rounded-lg shadow-sm border">
-                            <div class="px-6 py-4 border-b">
-                                <h3 class="font-semibold text-gray-800">Tickets recentes (SAC)</h3>
-                            </div>
-                            <div class="p-6">
-                                <ul class="divide-y">
-                                    @forelse($ticketsRecentes as $tk)
-                                        <li class="py-3 flex items-start justify-between gap-4">
-                                            <div>
-                                                <div class="font-medium text-gray-800">
-                                                    #{{ $tk->id }} —
-                                                    {{ \Illuminate\Support\Str::limit($tk->assunto ?? $tk->subject ?? 'Ticket', 60) }}
-                                                </div>
-                                                <div class="text-sm text-gray-500">
-                                                    {{ optional($tk->cliente)->nome
-                                                        ?? optional($tk->cliente)->name
-                                                        ?? optional($tk->user)->name
-                                                        ?? 'Cliente' }}
-                                                    •
-                                                    {{ ucfirst($tk->status ?? '—') }}
-                                                    •
-                                                    {{ optional($tk->created_at)->diffForHumans() ?? '' }}
-                                                </div>
-                                            </div>
-                                            @if(Route::has('cliente.sac.index'))
-                                                <a href="{{ route('cliente.sac.index') }}" class="text-indigo-600 hover:underline text-sm">abrir</a>
-                                            @endif
-                                        </li>
-                                    @empty
-                                        <li class="py-4 text-center text-gray-500">Sem tickets recentes.</li>
-                                    @endforelse
-                                </ul>
-                            </div>
-                        </div>
-                    @endif
+            {{-- Lista: Pedidos em separação --}}
+            <div class="bg-white overflow-hidden shadow-sm rounded-2xl">
+                <div class="p-5 border-b">
+                    <h3 class="text-lg font-semibold">Pedidos em Separação</h3>
+                    <p class="text-sm text-gray-500">Listando pedidos com <code>fulfillment_status = 'separacao'</code>.</p>
                 </div>
 
-                {{-- Coluna direita --}}
-                <div class="lg:col-span-4 space-y-6">
-                    {{-- Usuários recentes (somente gerente) --}}
-                    @if(($podeVerUsuarios ?? false) && $usuariosRecentes->count())
-                        <div class="bg-white rounded-lg shadow-sm border">
-                            <div class="px-6 py-4 border-b">
-                                <h3 class="font-semibold text-gray-800">Usuários recentes</h3>
-                            </div>
-                            <div class="p-6">
-                                <ul class="divide-y">
-                                    @foreach($usuariosRecentes as $u)
-                                        <li class="py-3">
-                                            <div class="font-medium text-gray-800">{{ $u->name }}</div>
-                                            <div class="text-sm text-gray-500">{{ $u->email }}</div>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                                @if(Route::has('gerente.usuarios.index'))
-                                    <div class="mt-4">
-                                        <a href="{{ route('gerente.usuarios.index') }}" class="text-indigo-600 hover:underline text-sm">gerenciar usuários</a>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
+                <div class="p-5 overflow-x-auto">
+                    @if(empty($pedidosSeparacao) || $pedidosSeparacao->isEmpty())
+                        <div class="text-sm text-gray-500">Nenhum pedido em separação no momento.</div>
+                    @else
+                        <table class="min-w-full text-sm">
+                            <thead>
+                                <tr class="text-left text-gray-600 border-b">
+                                    <th class="py-2 pr-4">#</th>
+                                    <th class="py-2 pr-4">Cliente</th>
+                                    <th class="py-2 pr-4">E-mail</th>
+                                    <th class="py-2 pr-4">Total</th>
+                                    <th class="py-2 pr-4">Criado em</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                @foreach($pedidosSeparacao as $pedido)
+                                    @php
+                                        $id  = is_array($pedido) ? ($pedido['id'] ?? null) : ($pedido->id ?? null);
+                                        $nm  = is_array($pedido) ? ($pedido['customer_name'] ?? null) : ($pedido->customer_name ?? null);
+                                        $em  = is_array($pedido) ? ($pedido['customer_email'] ?? null) : ($pedido->customer_email ?? null);
+                                        $ttl = is_array($pedido) ? ($pedido['total'] ?? 0) : ($pedido->total ?? 0);
+                                        $dt  = is_array($pedido) ? ($pedido['created_at'] ?? null) : ($pedido->created_at ?? null);
+                                    @endphp
+                                    <tr>
+                                        <td class="py-2 pr-4 font-medium">#{{ $id }}</td>
+                                        <td class="py-2 pr-4">{{ $nm ?? '—' }}</td>
+                                        <td class="py-2 pr-4">{{ $em ?? '—' }}</td>
+                                        <td class="py-2 pr-4">R$ {{ number_format($ttl, 2, ',', '.') }}</td>
+                                        <td class="py-2 pr-4">{{ $dt ? \Illuminate\Support\Carbon::parse($dt)->format('d/m/Y H:i') : '—' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Lista: Produtos esgotados na vitrine (active = 0 OU stock ≤ 10) --}}
+            <div class="bg-white overflow-hidden shadow-sm rounded-2xl">
+                <div class="p-5 border-b">
+                    <h3 class="text-lg font-semibold">Produtos Esgotados na Vitrine</h3>
+                    <p class="text-sm text-gray-500">
+                        Regras (união): <code>active = 0</code> <strong>OU</strong> <code>stock &le; 10</code>.  
+                        Mostrando <code>SKU</code>, <code>Nome</code>, <code>Estoque</code>, <code>Ativo?</code> e <code>Motivo</code>.
+                    </p>
+                </div>
+
+                <div class="p-5 overflow-x-auto">
+                    @if(empty($produtosEsgotados) || $produtosEsgotados->isEmpty())
+                        <div class="text-sm text-green-700">Nenhum produto para alertar na vitrine. 🎉</div>
+                    @else
+                        <table class="min-w-full text-sm">
+                            <thead>
+                                <tr class="text-left text-gray-600 border-b">
+                                    <th class="py-2 pr-4">#</th>
+                                    <th class="py-2 pr-4">SKU</th>
+                                    <th class="py-2 pr-4">Nome</th>
+                                    <th class="py-2 pr-4">Estoque</th>
+                                    <th class="py-2 pr-4">Ativo?</th>
+                                    <th class="py-2 pr-4">Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                @foreach($produtosEsgotados as $p)
+                                    @php
+                                        $id     = is_array($p) ? ($p['id'] ?? null)     : ($p->id ?? null);
+                                        $sku    = is_array($p) ? ($p['sku'] ?? null)    : ($p->sku ?? null);
+                                        $name   = is_array($p) ? ($p['name'] ?? null)   : ($p->name ?? null);
+                                        $stock  = is_array($p) ? ($p['stock'] ?? null)  : ($p->stock ?? null);
+                                        $active = is_array($p) ? ($p['active'] ?? null) : ($p->active ?? null);
+                                        $motivo = is_array($p) ? ($p['motivo'] ?? null) : ($p->motivo ?? null);
+                                    @endphp
+                                    <tr>
+                                        <td class="py-2 pr-4 font-medium">{{ $id }}</td>
+                                        <td class="py-2 pr-4">{{ $sku ?? '—' }}</td>
+                                        <td class="py-2 pr-4">{{ $name }}</td>
+                                        <td class="py-2 pr-4">{{ $stock }}</td>
+                                        <td class="py-2 pr-4">
+                                            @if(!is_null($active))
+                                                {{ (int)$active === 1 ? 'Sim' : 'Não' }}
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
+                                        <td class="py-2 pr-4">{{ $motivo ?? '—' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     @endif
                 </div>
             </div>
