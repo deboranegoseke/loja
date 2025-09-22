@@ -1,26 +1,24 @@
 <?php
 
-namespace App\Models;
+namespace App\Providers;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\ServiceProvider;
 
-class SupportMessage extends Model
+class AppServiceProvider extends ServiceProvider
 {
-    protected $fillable = [
-        'support_ticket_id',
-        'user_id',
-        'sender_type', // 'store' | 'customer'
-        'body',
-    ];
-
-    public function ticket(): BelongsTo
+    /**
+     * Register any application services.
+     */
+    public function register(): void
     {
-        return $this->belongsTo(SupportTicket::class, 'support_ticket_id');
+        //
     }
 
-    public function user(): BelongsTo
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
     {
-        return $this->belongsTo(User::class);
+        //
     }
 }

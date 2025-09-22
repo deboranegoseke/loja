@@ -11,20 +11,24 @@ class SupportTicket extends Model
 {
     use HasFactory;
 
+    protected $table = 'support_tickets';
+
     protected $fillable = [
         'user_id',
         'order_id',
-        'status',
+        'status',     // pode vir 'open', 'aberto', 'closed', 'fechado'
+        'subject',    // sua tabela tem essa coluna (nullable)
         'closed_at',
-        // 'subject',
     ];
 
     protected $casts = [
-        'closed_at' => 'datetime',
+        'closed_at'  => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // Para aparecer como propriedade ($ticket->status_label) e em toArray()/JSON
-    protected $appends = ['status_label'];
+    protected $appends = ['status_label', 'is_open'];
 
     // --- RELACIONAMENTOS ---
     public function user(): BelongsTo
@@ -43,15 +47,31 @@ class SupportTicket extends Model
             ->orderBy('created_at');
     }
 
-    // --- ACCESSORS ---
+    // --- SCOPES ÚTEIS ---
+    public function scopeOpen($q)
+    {
+        return $q->whereIn('status', ['open', 'aberto']);
+    }
+
+    public function scopeClosed($q)
+    {
+        return $q->whereIn('status', ['closed', 'fechado']);
+    }
+
+    // --- ACCESSORS / COMPUTEDS ---
     public function getStatusLabelAttribute(): string
     {
-        return match ($this->status) {
-            // 'Open' grava no BD e na view aparece 'Aberto'
-            'open'     => 'Aberto', 
-            // 'closed' grava no BD e na view aparece 'Fechado'
-            'closed'   => 'Fechado',
-            default    => ucfirst((string) $this->status),
+        $status = strtolower((string) $this->status);
+
+        return match ($status) {
+            'open', 'aberto'     => 'Aberto',
+            'closed', 'fechado'  => 'Fechado',
+            default              => ucfirst($status),
         };
+    }
+
+    public function getIsOpenAttribute(): bool
+    {
+        return in_array(strtolower((string) $this->status), ['open', 'aberto'], true);
     }
 }
