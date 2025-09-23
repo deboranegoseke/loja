@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -8,15 +8,13 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->enum('role', ['cliente','adm','gerente'])->default('cliente');
+            $table->string('name');                                     // dump: name varchar(255) NOT NULL
+            $table->string('email')->unique();                           // dump: email varchar(255) NOT NULL
+            $table->string('role', 20)->default('cliente')->index();     // dump: enum('cliente','adm','gerente') default 'cliente'
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-
-            $table->index('role');
         });
     }
     public function down(): void {

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,13 +13,11 @@ return new class extends Migration {
             $table->string('status')->default('novo');
             $table->string('fulfillment_status', 30)->default('aguardando');
             $table->string('tracking_code')->nullable();
-            $table->timestamps();
             $table->string('customer_name')->nullable();
             $table->string('customer_email')->nullable();
             $table->string('pix_txid', 35)->nullable();
             $table->text('pix_payload')->nullable();
-
-            $table->index('user_id');
+            $table->timestamps();
         });
     }
     public function down(): void {

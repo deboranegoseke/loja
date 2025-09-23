@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,14 +10,12 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('support_ticket_id')->constrained('support_tickets')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('sender_type', ['customer','store']);
+            $table->string('sender_type', 20);     // 'customer' | 'store'
             $table->text('body');
             $table->json('attachments')->nullable();
             $table->timestamps();
 
-            $table->index(['support_ticket_id','created_at']);
-            $table->index('sender_type');
-            $table->index('user_id');
+            $table->index(['support_ticket_id','user_id']);
         });
     }
     public function down(): void {
