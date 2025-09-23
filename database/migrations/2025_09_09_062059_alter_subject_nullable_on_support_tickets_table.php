@@ -12,19 +12,15 @@ return new class extends Migration
         $driver = DB::getDriverName();
 
         if ($driver === 'pgsql') {
-            // PostgreSQL: sem MODIFY. Usa ALTER COLUMN e, se precisar, corta para 255.
-            DB::statement("
-                ALTER TABLE support_tickets
-                    ALTER COLUMN subject TYPE VARCHAR(255) USING LEFT(subject, 255),
-                    ALTER COLUMN subject DROP NOT NULL
-            ");
+            // PostgreSQL: ALTER COLUMN + DROP NOT NULL
+            DB::statement("ALTER TABLE support_tickets ALTER COLUMN message DROP NOT NULL");
         } elseif ($driver === 'mysql') {
-            // MySQL
-            DB::statement("ALTER TABLE support_tickets MODIFY subject VARCHAR(255) NULL");
+            // MySQL: MODIFY
+            DB::statement("ALTER TABLE support_tickets MODIFY message TEXT NULL");
         } else {
-            // Fallback por Schema Builder (requer doctrine/dbal se for usar change())
+            // Outros bancos: usar Schema builder (requer doctrine/dbal)
             Schema::table('support_tickets', function (Blueprint $table) {
-                $table->string('subject', 255)->nullable()->change();
+                $table->text('message')->nullable()->change();
             });
         }
     }
@@ -34,15 +30,12 @@ return new class extends Migration
         $driver = DB::getDriverName();
 
         if ($driver === 'pgsql') {
-            DB::statement("
-                ALTER TABLE support_tickets
-                    ALTER COLUMN subject SET NOT NULL
-            ");
+            DB::statement("ALTER TABLE support_tickets ALTER COLUMN message SET NOT NULL");
         } elseif ($driver === 'mysql') {
-            DB::statement("ALTER TABLE support_tickets MODIFY subject VARCHAR(255) NOT NULL");
+            DB::statement("ALTER TABLE support_tickets MODIFY message TEXT NOT NULL");
         } else {
             Schema::table('support_tickets', function (Blueprint $table) {
-                $table->string('subject', 255)->nullable(false)->change();
+                $table->text('message')->nullable(false)->change();
             });
         }
     }
