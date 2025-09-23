@@ -3,7 +3,7 @@
 ############################################################
 APP_NAME="Lojinha Cupcakes"
 APP_ENV=production
-APP_KEY=base64:IUr+ZkH1KIcJovrmqwU99pgbgzJi4uIcUFErbXCF718=
+APP_KEY=
 APP_DEBUG=false
 APP_URL=https://SEU_DOMINIO.koyeb.app
 
