@@ -5,24 +5,28 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up(): void {
+    public function up(): void
+    {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('logradouro');
+            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
+
+            $table->string('logradouro', 255);
             $table->string('numero', 50);
-            $table->string('complemento')->nullable();
+            $table->string('complemento', 255)->nullable();
             $table->string('bairro', 120);
             $table->string('cidade', 120);
-            $table->char('estado', 2);
-            $table->string('cep', 9);
+            $table->char('estado', 2);           // UF
+            $table->string('cep', 9);            // formato 00000-000 (aceita sem hífen também)
+
             $table->timestamps();
 
-            $table->unique('user_id');                 // addresses_user_id_unique
-            $table->index(['estado','cidade']);        // addresses_estado_cidade_index
+            $table->index(['estado', 'cidade']);
         });
     }
-    public function down(): void {
+
+    public function down(): void
+    {
         Schema::dropIfExists('addresses');
     }
 };
