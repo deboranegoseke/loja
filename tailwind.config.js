@@ -4,11 +4,12 @@ export default {
     "./resources/**/*.blade.php",
     "./resources/**/*.js",
     "./resources/**/*.vue",
-    // Paginação do Laravel (opcional, mas útil)
-    "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
+    "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php"
   ],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms')
+  ],
 }
