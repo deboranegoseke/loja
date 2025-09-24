@@ -8,7 +8,8 @@
 
   "require": {
     "php": "^8.2",
-    "ext-pdo_pgsql": "*",
+    "ext-pdo_mysql": "*",
+    "ext-gd": "*",
     "laravel/framework": "^12.0",
     "laravel/tinker": "^2.10.1",
     "simplesoftwareio/simple-qrcode": "^4.2"
@@ -82,3 +83,4 @@
   "minimum-stability": "stable",
   "prefer-stable": true
 }
+
