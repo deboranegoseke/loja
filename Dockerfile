@@ -9,6 +9,8 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY composer.json composer.lock ./
 
+RUN echo "----- composer.json -----" && cat composer.json && echo "------------------------"
+
 RUN composer install \
     --no-dev \
     --prefer-dist \
