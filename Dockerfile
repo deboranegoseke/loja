@@ -1,7 +1,7 @@
 ########################
 # 1) Builder: Composer #
 ########################
-FROM composer:2 AS vendor
+FROM public.ecr.aws/docker/library/composer:2 AS vendor
 WORKDIR /app
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
@@ -24,7 +24,7 @@ RUN composer install \
 #################################
 # 2) Runtime: PHP + Apache 8.2  #
 #################################
-FROM php:8.2-apache-bookworm
+FROM public.ecr.aws/docker/library/php:8.2-apache-bookworm
 
 RUN set -eux; \
     apt-get update; \
