@@ -30,14 +30,27 @@ FROM php:8.2-apache-bookworm
 
 RUN set -eux; \
     apt-get update; \
+    # utilitários básicos
     apt-get install -y --no-install-recommends \
         ca-certificates \
         git \
         unzip; \
+    \
+    # *** LIBS DE RUNTIME QUE FICAM NA IMAGEM ***
+    apt-get install -y --no-install-recommends \
+        libpng16-16 \
+        libjpeg62-turbo \
+        libfreetype6; \
+    \
+    # pacotes *-dev só para compilar as extensões
     buildDeps="libpng-dev libjpeg62-turbo-dev libfreetype6-dev"; \
     apt-get install -y --no-install-recommends $buildDeps; \
+    \
+    # compila gd com suporte a freetype e jpeg + pdo_mysql
     docker-php-ext-configure gd --with-freetype --with-jpeg; \
     docker-php-ext-install -j"$(nproc)" gd pdo_mysql; \
+    \
+    # remove SOMENTE os *-dev; mantém as libs de runtime
     apt-get purge -y --auto-remove $buildDeps; \
     rm -rf /var/lib/apt/lists/*
 
