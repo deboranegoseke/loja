@@ -45,7 +45,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        // Loga o usuário
+        // Loga o usuário + regenera sessão (ok)
         Auth::login($user);
         $request->session()->regenerate();
 
@@ -54,9 +54,9 @@ class RegisteredUserController extends Controller
             ? ($user->hasRole('gerente') || $user->hasRole('adm'))
             : in_array($user->role, ['gerente', 'adm'], true);
 
-        // Redireciona staff para dashboard e cliente para welcome
+        // Redireciona diretamente para rotas GET estáveis (evita intended->POST)
         return $isStaff
-            ? redirect()->intended(route('dashboard'))
-            : redirect()->route('welcome');
+            ? redirect()->route('dashboard')   // GET protegido por auth/verified/role
+            : redirect()->route('welcome');    // GET público
     }
 }
