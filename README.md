@@ -41,7 +41,11 @@ MAIL_FROM_NAME="Lojinha"
 # 7. Ativar XAMPP: iniciar Apache e MySQL
 ***(isso é feito pela interface do XAMPP)***
 
-# 8. Criar o banco de dados "lojinha"
+# 8. projetar o banco de dados "lojinha"
+    Banco_de_dados_diagrama.png
+    banco_de_dados.md
+
+# 9. Criar o banco de dados "lojinha"
 php artisan migrate
 
 # 10. Testar o site localmente
