@@ -1,3 +1,4 @@
+{{-- resources/views/customer/orders/show.blade.php --}}
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
@@ -107,21 +108,28 @@
                 </div>
             </div>
 
-            {{-- RASTREIO --}}
+            {{-- RASTREIO (sem "Rota de entrega") --}}
             <div class="bg-white shadow-sm sm:rounded-lg">
                 <div class="p-4 sm:p-6">
                     <h3 class="font-semibold mb-4">Rastreio</h3>
 
                     @if ($order->isPaid())
                         @php
+                            // Passos SEM "Rota de entrega"
                             $steps = [
-                                ['key' => 'separacao',    'label' => 'Separação'],
-                                ['key' => 'em_transito',  'label' => 'Em trânsito'],
-                                ['key' => 'rota_entrega', 'label' => 'Rota de entrega'],
-                                ['key' => 'entregue',     'label' => 'Entregue'],
+                                ['key' => 'separacao',   'label' => 'Separação'],
+                                ['key' => 'em_transito', 'label' => 'Em trânsito'],
+                                ['key' => 'entregue',    'label' => 'Entregue'],
                             ];
+
                             $mapIndex = array_flip(array_column($steps, 'key'));
-                            $current  = $mapIndex[$order->fulfillment_status] ?? -1;
+
+                            // Compatibilidade: se status vier como "rota_entrega", trate como "em_transito"
+                            $statusKey = $order->fulfillment_status === 'rota_entrega'
+                                ? 'em_transito'
+                                : $order->fulfillment_status;
+
+                            $current  = $mapIndex[$statusKey] ?? -1;
                         @endphp
 
                         <ol class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -158,7 +166,7 @@
                 </div>
             </div>
 
-            {{-- AÇÕES FINAIS (opcionais) --}}
+            {{-- AÇÕES FINAIS --}}
             <div class="flex flex-col xs:flex-row xs:items-center gap-2">
                 <a href="{{ route('cliente.pedidos.index') }}"
                    class="w-full xs:w-auto inline-flex justify-center rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-50">

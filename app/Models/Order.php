@@ -23,7 +23,6 @@ class Order extends Model
         'total' => 'decimal:2',
     ];
 
-    // Se você quiser que o label apareça também em toArray()/JSON, deixe 'status_label' aqui:
     protected $appends = ['status_label'];
 
     // --- Relacionamentos ---
@@ -59,13 +58,12 @@ class Order extends Model
         };
     }
 
-    // Label do RASTREIO
+    // Label do RASTREIO (rota_entrega removido)
     public function getFulfillmentStatusLabelAttribute(): string
     {
         return match ($this->fulfillment_status) {
             'separacao'     => 'Separação',
             'em_transito'   => 'Em trânsito',
-            'rota_entrega'  => 'Rota de entrega',
             'entregue'      => 'Entregue',
             'problema'      => 'Ocorrência',
             'cancelado'     => 'Cancelado',
@@ -73,13 +71,12 @@ class Order extends Model
         };
     }
 
-    // Classe visual (badge) do RASTREIO
+    // Classe visual (badge) do RASTREIO (rota_entrega removido)
     public function getFulfillmentBadgeClassAttribute(): string
     {
         return match ($this->fulfillment_status) {
             'separacao'     => 'bg-amber-100 text-amber-800',
             'em_transito'   => 'bg-blue-100 text-blue-800',
-            'rota_entrega'  => 'bg-indigo-100 text-indigo-800',
             'entregue'      => 'bg-green-100 text-green-800',
             'problema'      => 'bg-red-100 text-red-800',
             'cancelado'     => 'bg-gray-200 text-gray-700',
