@@ -65,12 +65,12 @@
                                                         </button>
 
                                                         {{-- Quantidade como H1 (negrito e maior), largura fixa em 3ch --}}
-                                                        <h4
+                                                        <h6
                                                             class="qty-display border-2 border-gray-700 rounded-lg w-[3ch] min-w-[3ch] max-w-[3ch] h-12 sm:h-11 inline-flex items-center justify-center text-3xl sm:text-2xl font-extrabold font-mono tabular-nums select-none bg-white text-gray-900 shadow-sm"
                                                             aria-label="Quantidade"
                                                             role="status">
                                                             {{ str_pad($qty, 2, '0', STR_PAD_LEFT) }}
-                                                        </h4>
+                                                        </h6>
 
                                                         {{-- Botão aumentar --}}
                                                         <button type="button"
