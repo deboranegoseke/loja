@@ -63,6 +63,13 @@
                                                         <input type="text"
                                                                class="qty-input w-10 flex-none text-center text-sm py-2 outline-none"
                                                                value="{{ $qty }}" inputmode="numeric" aria-label="Quantidade" readonly>
+
+<input type="text"
+       class="qty-input w-[3ch] flex-none text-center text-sm py-2 outline-none tabular-nums"
+       value="{{ $qty }}" inputmode="numeric" aria-label="Quantidade" readonly>
+
+
+
                                                         <button type="button"
                                                                 class="qty-btn px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                                                 data-delta="1" aria-label="Aumentar">
