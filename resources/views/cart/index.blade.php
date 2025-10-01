@@ -54,28 +54,28 @@
                                                 </div>
 
                                                 {{-- Controles: quantidade (+/-) / remover --}}
-                                                <div class="mt-3 flex flex-col gap-2 w-auto max-w-fit">
-                                                    {{-- Grupo compacto usando <h1> como display da quantidade (bold e maior) --}}
-                                                    <div class="inline-flex items-center gap-1 w-auto max-w-fit shrink-0">
-                                                        {{-- Botão diminuir (mesmo tamanho do display) --}}
+                                                <div class="mt-3 flex flex-col gap-3 w-auto max-w-fit">
+                                                    {{-- Grupo com botões evidentes e espaçamento maior (ótimo no celular) --}}
+                                                    <div class="inline-flex items-center gap-2 w-auto max-w-fit shrink-0">
+                                                        {{-- Botão diminuir --}}
                                                         <button type="button"
-                                                            class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded w-[3ch] h-[3ch] text-xl sm:text-2xl font-bold text-gray-800 hover:bg-gray-50 select-none leading-none"
-                                                            data-delta="-1" aria-label="Diminuir">
+                                                            class="qty-btn inline-flex items-center justify-center border-2 border-gray-700 rounded-lg w-12 h-12 sm:w-11 sm:h-11 text-2xl sm:text-xl font-black text-gray-900 bg-white hover:bg-gray-50 active:scale-95 transition select-none shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+                                                            data-delta="-1" aria-label="Diminuir quantidade">
                                                             –
                                                         </button>
 
-                                                        {{-- Quantidade como H1 (negrito e maior), caixa fixa 3ch --}}
+                                                        {{-- Quantidade como H1 (negrito e maior), largura fixa em 3ch --}}
                                                         <h1
-                                                            class="qty-display border border-gray-400 rounded w-[3ch] min-w-[3ch] max-w-[3ch] h-[3ch] inline-flex items-center justify-center text-2xl sm:text-3xl font-extrabold font-mono tabular-nums select-none"
+                                                            class="qty-display border-2 border-gray-700 rounded-lg w-[3ch] min-w-[3ch] max-w-[3ch] h-12 sm:h-11 inline-flex items-center justify-center text-3xl sm:text-2xl font-extrabold font-mono tabular-nums select-none bg-white text-gray-900 shadow-sm"
                                                             aria-label="Quantidade"
                                                             role="status">
                                                             {{ str_pad($qty, 2, '0', STR_PAD_LEFT) }}
                                                         </h1>
 
-                                                        {{-- Botão aumentar (mesmo tamanho do display) --}}
+                                                        {{-- Botão aumentar --}}
                                                         <button type="button"
-                                                            class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded w-[3ch] h-[3ch] text-xl sm:text-2xl font-bold text-gray-800 hover:bg-gray-50 select-none leading-none"
-                                                            data-delta="1" aria-label="Aumentar">
+                                                            class="qty-btn inline-flex items-center justify-center border-2 border-gray-700 rounded-lg w-12 h-12 sm:w-11 sm:h-11 text-2xl sm:text-xl font-black text-gray-900 bg-white hover:bg-gray-50 active:scale-95 transition select-none shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+                                                            data-delta="1" aria-label="Aumentar quantidade">
                                                             +
                                                         </button>
                                                     </div>
