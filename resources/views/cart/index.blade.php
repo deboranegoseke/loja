@@ -55,26 +55,26 @@
 
                                                 {{-- Controles: quantidade (+/-) / remover --}}
                                                 <div class="mt-3 flex flex-col gap-2 w-auto max-w-fit">
-                                                    {{-- Grupo compacto usando <span> (sem input) --}}
+                                                    {{-- Grupo compacto usando <h1> como display da quantidade (bold e maior) --}}
                                                     <div class="inline-flex items-center gap-1 w-auto max-w-fit shrink-0">
-                                                        {{-- Botão diminuir --}}
+                                                        {{-- Botão diminuir (mesmo tamanho do display) --}}
                                                         <button type="button"
-                                                            class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded w-[3ch] h-[3ch] text-sm font-bold text-gray-800 hover:bg-gray-50 select-none"
+                                                            class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded w-[3ch] h-[3ch] text-xl sm:text-2xl font-bold text-gray-800 hover:bg-gray-50 select-none leading-none"
                                                             data-delta="-1" aria-label="Diminuir">
                                                             –
                                                         </button>
 
-                                                        {{-- Quantidade fixa em 3 “chars” de largura --}}
-                                                        <span
-                                                            class="qty-display border border-gray-400 rounded w-[3ch] min-w-[3ch] max-w-[3ch] h-[3ch] inline-flex items-center justify-center text-sm font-mono tabular-nums select-none"
+                                                        {{-- Quantidade como H1 (negrito e maior), caixa fixa 3ch --}}
+                                                        <h1
+                                                            class="qty-display border border-gray-400 rounded w-[3ch] min-w-[3ch] max-w-[3ch] h-[3ch] inline-flex items-center justify-center text-2xl sm:text-3xl font-extrabold font-mono tabular-nums select-none"
                                                             aria-label="Quantidade"
                                                             role="status">
                                                             {{ str_pad($qty, 2, '0', STR_PAD_LEFT) }}
-                                                        </span>
+                                                        </h1>
 
-                                                        {{-- Botão aumentar --}}
+                                                        {{-- Botão aumentar (mesmo tamanho do display) --}}
                                                         <button type="button"
-                                                            class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded w-[3ch] h-[3ch] text-sm font-bold text-gray-800 hover:bg-gray-50 select-none"
+                                                            class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded w-[3ch] h-[3ch] text-xl sm:text-2xl font-bold text-gray-800 hover:bg-gray-50 select-none leading-none"
                                                             data-delta="1" aria-label="Aumentar">
                                                             +
                                                         </button>
@@ -179,8 +179,8 @@
 
             function setQty(row, newQty) {
                 row.dataset.qty = String(newQty);
-                const span = row.querySelector('.qty-display');
-                if (span) span.textContent = String(newQty).padStart(2, '0');
+                const display = row.querySelector('.qty-display');
+                if (display) display.textContent = String(newQty).padStart(2, '0');
             }
 
             function recalcSubtotal() {
