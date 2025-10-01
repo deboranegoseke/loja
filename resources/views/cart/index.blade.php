@@ -54,30 +54,30 @@
 
                                                 {{-- Controles: quantidade (+/-) / remover --}}
                                                 <div class="mt-3 flex flex-col gap-2 w-auto max-w-fit">
-                                                    {{-- Grupo super compacto (NÃO expandir) --}}
-                                                    <div class="inline-flex items-center gap-1 w-auto max-w-fit shrink-0">
+                                                    {{-- Grupo compacto --}}
+                                                    <div class="inline-flex items-center gap-1 w-auto max-w-fit">
                                                         {{-- Botão diminuir --}}
                                                         <button type="button"
-                                                                class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded-sm w-8 h-8 sm:w-9 sm:h-9 text-sm leading-none text-gray-800 hover:bg-gray-50"
-                                                                data-delta="-1" aria-label="Diminuir">
+                                                            class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded w-10 h-10 text-base font-bold text-gray-800 hover:bg-gray-50"
+                                                            data-delta="-1" aria-label="Diminuir">
                                                             &lt;
                                                         </button>
 
-                                                        {{-- Campo quantidade (3–3.5ch) --}}
+                                                        {{-- Campo quantidade fixo --}}
                                                         <input type="text"
-                                                               class="qty-input border border-gray-400 rounded-sm w-[3.5ch] h-8 sm:h-9 flex-none text-center text-sm font-mono tabular-nums outline-none"
-                                                               value="{{ str_pad($qty, 2, '0', STR_PAD_LEFT) }}"
-                                                               inputmode="numeric" aria-label="Quantidade" readonly>
+                                                            class="qty-input border border-gray-400 rounded w-[3ch] min-w-[3ch] max-w-[3ch] h-10 flex-none text-center text-base font-mono tabular-nums outline-none"
+                                                            value="{{ str_pad($qty, 2, '0', STR_PAD_LEFT) }}"
+                                                            inputmode="numeric" aria-label="Quantidade" readonly>
 
                                                         {{-- Botão aumentar --}}
                                                         <button type="button"
-                                                                class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded-sm w-8 h-8 sm:w-9 sm:h-9 text-sm leading-none text-gray-800 hover:bg-gray-50"
-                                                                data-delta="1" aria-label="Aumentar">
+                                                            class="qty-btn inline-flex items-center justify-center border border-gray-400 rounded w-10 h-10 text-base font-bold text-gray-800 hover:bg-gray-50"
+                                                            data-delta="1" aria-label="Aumentar">
                                                             &gt;
                                                         </button>
                                                     </div>
 
-                                                    {{-- Remover (única ação de exclusão) --}}
+                                                    {{-- Remover --}}
                                                     <form method="POST" action="{{ route('cart.remove', $itemId) }}" class="remove-form">
                                                         @csrf @method('DELETE')
                                                         <button
@@ -186,8 +186,6 @@
                 if (!itemId) return;
 
                 newQty = Math.max(0, Number(newQty || 0)); // mínimo 0
-
-                // Preenche com 2 dígitos para ficar como no mock: 01, 02, 25...
                 const display = String(newQty).padStart(2, '0');
 
                 const input = row.querySelector('.qty-input');
